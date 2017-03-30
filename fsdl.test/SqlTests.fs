@@ -33,21 +33,21 @@ module TestSqlData =
         }
 
     let expectedCreateTableDefinitions = """-- Create tCreatedTable
-CREATE TABLE tCreatedTable (
-    ID INT IDENTITY(1,1) NOT NULL,
-    Name NVARCHAR(16) NULL,
-    GUID UNIQUEIDENTIFIER NOT NULL CONSTRAINT DF_tCreatedTable_GUID DEFAULT NEWID(),
-    Date DATETIME NOT NULL CONSTRAINT DF_tCreatedTable_Date DEFAULT GETDATE(),
-    Index INT NOT NULL CONSTRAINT DF_tCreatedTable_Index DEFAULT 100,
-    Active BIT NOT NULL CONSTRAINT DF_tCreatedTable_Active DEFAULT 0,
-    Price DECIMAL(18,2) NULL,
-    Description NVARCHAR(MAX) NULL,
-    FKID INT NULL,
-    CommonDate DATETIME NOT NULL CONSTRAINT DF_tCreatedTable_CommonDate DEFAULT GETDATE(),
-    CommonFKID INT NOT NULL CONSTRAINT DF_tCreatedTable_CommonFKID DEFAULT 1,
+CREATE TABLE [tCreatedTable] (
+    [ID] INT IDENTITY(1,1) NOT NULL,
+    [Name] NVARCHAR(16) NULL,
+    [GUID] UNIQUEIDENTIFIER NOT NULL CONSTRAINT DF_tCreatedTable_GUID DEFAULT NEWID(),
+    [Date] DATETIME NOT NULL CONSTRAINT DF_tCreatedTable_Date DEFAULT GETDATE(),
+    [Index] INT NOT NULL CONSTRAINT DF_tCreatedTable_Index DEFAULT 100,
+    [Active] BIT NOT NULL CONSTRAINT DF_tCreatedTable_Active DEFAULT 0,
+    [Price] DECIMAL(18,2) NULL,
+    [Description] NVARCHAR(MAX) NULL,
+    [FKID] INT NULL,
+    [CommonDate] DATETIME NOT NULL CONSTRAINT DF_tCreatedTable_CommonDate DEFAULT GETDATE(),
+    [CommonFKID] INT NOT NULL CONSTRAINT DF_tCreatedTable_CommonFKID DEFAULT 1,
     CONSTRAINT PK_tCreatedTable PRIMARY KEY CLUSTERED (
-        ID ASC,
-        GUID ASC
+        [ID] ASC,
+        [GUID] ASC
     )
 )
 
@@ -58,10 +58,10 @@ PRINT 'Tables Created'
 """
 
     let expectedKeyDefinitions = """-- Create tCreatedTable foreign keys
-ALTER TABLE tCreatedTable WITH CHECK ADD CONSTRAINT FK_tCreatedTable_tFKTable_FKID
-FOREIGN KEY (FKID) REFERENCES tFKTable (ID)
-ALTER TABLE tCreatedTable WITH CHECK ADD CONSTRAINT FK_tCreatedTable_tCommonFKTable_CommonFKID
-FOREIGN KEY (CommonFKID) REFERENCES tCommonFKTable (ID)
+ALTER TABLE [tCreatedTable] WITH CHECK ADD CONSTRAINT FK_tCreatedTable_tFKTable_FKID
+FOREIGN KEY ([FKID]) REFERENCES [tFKTable] ([ID])
+ALTER TABLE [tCreatedTable] WITH CHECK ADD CONSTRAINT FK_tCreatedTable_tCommonFKTable_CommonFKID
+FOREIGN KEY ([CommonFKID]) REFERENCES [tCommonFKTable] ([ID])
 
 GO
 
