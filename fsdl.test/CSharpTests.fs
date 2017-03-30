@@ -26,9 +26,9 @@ module TestCSharpData =
                     Null("Price", MONEY)
                     Null("Description", TEXT)
                     Null("FKID", INT)] 
-            constraints = [ASC("ID")
-                           ASC("GUID")]
-            fks = [ForeignKey("FKID", "tFKTable", "ID")] 
+            constraints = [PrimaryKey("ID")
+                           ForeignKey("FKID", "tFKTable", "ID")]
+            indexes = []
             dapperext = true
         }
 
@@ -45,7 +45,6 @@ namespace test.com.DTO
         public int ID { get; set; }
         [StringLength(16)]
         public string Name { get; set; }
-        [d.ExplicitKey]
         public Guid GUID { get; set; }
         public DateTime Date { get; set; }
         public int Index { get; set; }
@@ -54,7 +53,8 @@ namespace test.com.DTO
         public string Description { get; set; }
         public int? FKID { get; set; }
     }
-}"""
+}
+"""
 
 [<TestFixture>]
 type ``Basic C# output tests`` () =

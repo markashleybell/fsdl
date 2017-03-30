@@ -2,20 +2,24 @@
 
 type StatementType = ALTER | CREATE
 
-type ColType = INT | BIT | DATE | MONEY | TEXT | GUID | CHR of int
+type DataType = INT | BIT | DATE | MONEY | TEXT | GUID | CHR of int
 
 type Default = NONE | NULL | TRUE | FALSE | NOW | NEWGUID | VAL of int
 
 type ColSpec = 
-    | Null of string * ColType
-    | NotNull of string * ColType * Default
-    | Identity of string * ColType * int * int
+    | Null of string * DataType
+    | NotNull of string * DataType * Default
+    | Identity of string * DataType * int * int
 
 type ConstraintSpec = 
-    | ASC of string
-    | DESC of string
+    | PrimaryKey of string
+    | ForeignKey of string * string * string
 
-type FKSpec = ForeignKey of string * string * string
+type IndexSpec = 
+    | ClusteredIndex of string
+    | ClusteredUniqueIndex of string
+    | NonClusteredIndex of string
+    | NonClusteredUniqueIndex of string
 
 type Table = {
     name:string; 
@@ -25,6 +29,6 @@ type Table = {
     stype:StatementType; 
     cols:ColSpec list; 
     constraints:ConstraintSpec list; 
-    fks:FKSpec list;
+    indexes:IndexSpec list;
     dapperext:bool;
 }

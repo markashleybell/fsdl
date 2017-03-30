@@ -26,9 +26,9 @@ module TestSqlData =
                     Null("Price", MONEY)
                     Null("Description", TEXT)
                     Null("FKID", INT)] 
-            constraints = [ASC("ID")
-                           ASC("GUID")]
-            fks = [ForeignKey("FKID", "tFKTable", "ID")] 
+            constraints = [PrimaryKey("ID")
+                           ForeignKey("FKID", "tFKTable", "ID")]
+            indexes = []
             dapperext = true
         }
 
@@ -44,11 +44,7 @@ CREATE TABLE [tCreatedTable] (
     [Description] NVARCHAR(MAX) NULL,
     [FKID] INT NULL,
     [CommonDate] DATETIME NOT NULL CONSTRAINT DF_tCreatedTable_CommonDate DEFAULT GETDATE(),
-    [CommonFKID] INT NOT NULL CONSTRAINT DF_tCreatedTable_CommonFKID DEFAULT 1,
-    CONSTRAINT PK_tCreatedTable PRIMARY KEY CLUSTERED (
-        [ID] ASC,
-        [GUID] ASC
-    )
+    [CommonFKID] INT NOT NULL CONSTRAINT DF_tCreatedTable_CommonFKID DEFAULT 1
 )
 
 GO
@@ -57,7 +53,7 @@ PRINT 'Tables Created'
 
 """
 
-    let expectedKeyDefinitions = """-- Create tCreatedTable foreign keys
+    let expectedConstraintDefinitions = """-- Create tCreatedTable foreign keys
 ALTER TABLE [tCreatedTable] WITH CHECK ADD CONSTRAINT FK_tCreatedTable_tFKTable_FKID
 FOREIGN KEY ([FKID]) REFERENCES [tFKTable] ([ID])
 ALTER TABLE [tCreatedTable] WITH CHECK ADD CONSTRAINT FK_tCreatedTable_tCommonFKTable_CommonFKID
@@ -69,7 +65,7 @@ PRINT 'Foreign Keys Created'
 
 """
 
-    let expectedCreateTableAndKeyDefinitions = expectedCreateTableDefinitions + expectedKeyDefinitions
+    let expectedCreateTableAndConstraintDefinitions = expectedCreateTableDefinitions + expectedConstraintDefinitions
 
 [<TestFixture>]
 type ``Basic SQL output tests`` () =
@@ -83,17 +79,17 @@ type ``Basic SQL output tests`` () =
 
     [<Test>] 
     member test.``Check FK output against reference`` () =
-        let sql = fsdl.generateKeyDefinitions 
+        let sql = fsdl.generateConstraintDefinitions 
                     [TestSqlData.testTable] TestSqlData.commonfks
 
         sql |> Console.WriteLine |> ignore
-        sql |> should equal TestSqlData.expectedKeyDefinitions
+        sql |> should equal TestSqlData.expectedConstraintDefinitions
 
     [<Test>] 
 
     member test.``Check combined CREATE TABLE and FK output against reference`` () =
-        let sql = fsdl.generateTableAndKeyDefinitions 
+        let sql = fsdl.generateTableAndConstraintDefinitions 
                     [TestSqlData.testTable] TestSqlData.commoncols TestSqlData.commonfks
 
         sql |> Console.WriteLine |> ignore
-        sql |> should equal TestSqlData.expectedCreateTableAndKeyDefinitions
+        sql |> should equal TestSqlData.expectedCreateTableAndConstraintDefinitions

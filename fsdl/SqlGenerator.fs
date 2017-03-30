@@ -9,7 +9,7 @@ module internal SqlGenerator =
     let brbr = br + br
     let commabr = sprintf ",%s" br // Shorthand for comma followed by newline
 
-    let coltype t = 
+    let columnDataType t = 
         match t with
         | INT -> "INT"
         | BIT -> "BIT"
@@ -19,11 +19,12 @@ module internal SqlGenerator =
         | TEXT -> "NVARCHAR(MAX)"
         | GUID -> "UNIQUEIDENTIFIER"
     
-    let col n t = sprintf "%s %s" (indent (sprintf "[%s]" n)) (coltype t)
+    let column columnName dataType = 
+        sprintf "%s %s" (indent (sprintf "[%s]" columnName)) (columnDataType dataType)
 
-    let def tblname n d =
-        let cn = sprintf " CONSTRAINT DF_%s_%s DEFAULT %s" tblname n 
-        match d with
+    let columnDefault tableName columnName defaultValue =
+        let cn = sprintf " CONSTRAINT DF_%s_%s DEFAULT %s" tableName columnName
+        match defaultValue with
         | NONE -> ""
         | NULL -> cn "NULL"
         | TRUE -> cn "1"
@@ -33,94 +34,81 @@ module internal SqlGenerator =
         | VAL i -> cn (sprintf "%i" i)
 
     // Column definition statement
-    let coldef tbl c = 
-        match c with
-        | Null (n, t) -> sprintf "%s NULL" (col n t)
-        | NotNull (n, t, d) -> sprintf "%s NOT NULL%s" (col n t) (def tbl.name n d)
-        | Identity (n, t, a, b) -> sprintf "%s IDENTITY(%i,%i) NOT NULL" (col n t) a b
+    let columnDefinition table columnSpec = 
+        match columnSpec with
+        | Null (columnName, dataType) -> sprintf "%s NULL" (column columnName dataType)
+        | NotNull (columnName, dataType, columnDefault') -> sprintf "%s NOT NULL%s" (column columnName dataType) (columnDefault table.name columnName columnDefault')
+        | Identity (columnName, dataType, initialValue, increment) -> sprintf "%s IDENTITY(%i,%i) NOT NULL" (column columnName dataType) initialValue increment
     
     // All column definitions for a table
-    let cols ccols tbl = 
-        ccols
-        |> List.append tbl.cols
-        |> List.map (coldef tbl)
+    let columnDefinitions columnSpecifications table = 
+        columnSpecifications
+        |> List.append table.cols
+        |> List.map (columnDefinition table)
         |> String.concat commabr
-        |> (fun s -> match tbl.stype with 
-                     | CREATE -> sprintf "%s," s
+        |> (fun s -> match table.stype with 
+                     | CREATE -> sprintf "%s" s
                      | ALTER -> sprintf "%s" s)
 
-    // PK constraint field
-    let cnstr c = 
-        let cf col dir = indent2 (sprintf "[%s] %s" col dir)
-        match c with 
-        | ASC s -> cf s "ASC"
-        | DESC s -> cf s "DESC"
+    // Constraint statement
+    let constraintStatement tableName constraintSpecification = 
+        let primaryKeyDefinition = sprintf "ALTER TABLE [%s] WITH CHECK ADD CONSTRAINT PK_%s%sPRIMARY KEY NONCLUSTERED ([%s])" 
+        let foreignKeyDefinition = sprintf "ALTER TABLE [%s] WITH CHECK ADD CONSTRAINT FK_%s_%s_%s%sFOREIGN KEY ([%s]) REFERENCES [%s] ([%s])" 
+        match constraintSpecification with 
+        | PrimaryKey columnName' -> (primaryKeyDefinition tableName tableName br columnName')
+        | ForeignKey (columnName', fkTable, fkColumn) -> (foreignKeyDefinition tableName tableName fkTable fkColumn br columnName' fkTable fkColumn)
 
-    // List of PK constraint fields
-    let cnstrs cnstrlist = 
-        cnstrlist
-        |> List.map cnstr 
-        |> String.concat commabr
+    // List of constraint statements for a table
+    let constraintStatements commonConstraints table =
+        let comment = sprintf "-- Create %s constraints" table.name
+        let constraintList = commonConstraints
+                             |> List.append table.constraints
+                             |> List.map (constraintStatement table.name)
 
-    // FK constraint statement
-    let fk tblname fk =
-        let fkd = sprintf "ALTER TABLE [%s] WITH CHECK ADD CONSTRAINT FK_%s_%s_%s%sFOREIGN KEY ([%s]) REFERENCES [%s] ([%s])" 
-        match fk with
-        | ForeignKey (c, kt, kc) -> fkd tblname tblname kt c br c kt kc
-
-    // List of foreign key statements for a table
-    let fks cfks tbl =
-        let com = sprintf "-- Create %s foreign keys" tbl.name
-        let fklist = cfks
-                     |> List.append tbl.fks
-                     |> List.map (fk tbl.name)
-
-        match fklist with
+        match constraintList with
         | [] -> ""
-        | lst -> sprintf "%s%s" (com::lst |> String.concat br) br
+        | constraints -> sprintf "%s%s" (comment::constraints |> String.concat br) br
 
     // CREATE and ALTER statement generators
-    let create commoncols tbl = 
-        let com = sprintf "-- Create %s" tbl.name
-        let create = sprintf "CREATE TABLE [%s] (" tbl.name
-        let constr = sprintf "    CONSTRAINT PK_%s PRIMARY KEY CLUSTERED (" tbl.name
-        let wth = sprintf "    )%s)" br
+    let createStatement commonColumns table = 
+        let comment = sprintf "-- Create %s" table.name
+        let create = sprintf "CREATE TABLE [%s] (" table.name
 
-        [com; create; (cols commoncols tbl); constr; (cnstrs tbl.constraints); wth] 
+        [comment; create; (columnDefinitions commonColumns table); ")"] 
         |> String.concat br
 
-    let alter commoncols tbl = 
-        let com = sprintf "-- Alter %s" tbl.name
-        let alter = sprintf "ALTER TABLE [%s] ADD" tbl.name
+    let alterStatement commonColumns table = 
+        let comment = sprintf "-- Alter %s" table.name
+        let alter = sprintf "ALTER TABLE [%s] ADD" table.name
 
-        [com; alter; (cols commoncols tbl)] 
+        [comment; alter; (columnDefinitions commonColumns table)] 
         |> String.concat br
 
-    let tabledef commoncols tbl =
-        match tbl.stype with
-        | CREATE -> create commoncols tbl
-        | ALTER -> alter commoncols tbl
+    let tableDefinition commonColumns table =
+        match table.stype with
+        | CREATE -> createStatement commonColumns table
+        | ALTER -> alterStatement commonColumns table
 
-    let tabledefs tbllist commoncols =
-        tbllist
-        |> List.map (tabledef commoncols)
+    let tableDefinitions tableList commonColumns =
+        tableList
+        |> List.map (tableDefinition commonColumns)
         |> String.concat brbr
 
-    let fkdefs tbllist commonfks =
-        tbllist
-        |> List.map (fks commonfks)
+    let constraintDefinitions tableList commonConstraints =
+        tableList
+        |> List.map (constraintStatements commonConstraints)
         |> List.filter (fun s -> s <> "")
         |> String.concat br
 
-    let generateTableDefinitions tables commoncols = 
+    let generateTableDefinitions tableList commonColumns = 
         sprintf "%s%sGO%s%s%s" 
-            (tabledefs tables commoncols) brbr brbr "PRINT 'Tables Created'" brbr
+            (tableDefinitions tableList commonColumns) brbr brbr "PRINT 'Tables Created'" brbr
 
-    let generateKeyDefinitions tables commonfks = 
+    let generateConstraintDefinitions tableList commonConstraints = 
         sprintf "%s%sGO%s%s%s" 
-            (fkdefs tables commonfks) br brbr "PRINT 'Foreign Keys Created'" brbr
+            (constraintDefinitions tableList commonConstraints) br brbr "PRINT 'Constraints Created'" brbr
 
-    let generateTableAndKeyDefinitions tables commoncols commonfks = 
+    let generateTableAndConstraintDefinitions tables commonColumns commonConstraints = 
         sprintf "%s%s" 
-            (generateTableDefinitions tables commoncols) 
-            (generateKeyDefinitions tables commonfks)
+            (generateTableDefinitions tables commonColumns) 
+            (generateConstraintDefinitions tables commonConstraints)
