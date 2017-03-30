@@ -1,5 +1,5 @@
 <Query Kind="FSharpProgram">
-  <Reference Relative="fsdl\bin\Debug\fsdl.dll">C:\Src\fsdl\fsdl\bin\Debug\fsdl.dll</Reference>
+  <Reference Relative="fsdl\bin\Debug\fsdl.dll">E:\Src\fsdl\fsdl\bin\Debug\fsdl.dll</Reference>
   <Namespace>fsdl</Namespace>
 </Query>
 
@@ -9,32 +9,40 @@ let commoncols = [NotNull("CommonDate", DATE, NOW)
 let commonfks = [ForeignKey("CommonFKID", "tCommonFKTable", "ID")]
 
 let testTable = {
-        stype=CREATE
-        name="tCreatedTable"
-        cols = [Identity("ID", INT, 1, 1)
-                Null("Name", CHR(16))
-                NotNull("Index", INT, VAL(100))
-                NotNull("Active", BIT, FALSE)
-                Null("Price", MONEY)
-                Null("Description", TEXT)
-                NotNull("FKID", INT, NONE)] 
-        constraints = [ASC("ID")]
-        fks = [ForeignKey("FKID", "tFKTable", "ID")] 
-    }
+    stype=CREATE
+    name="tCreatedTable"
+    dtoname = "CreatedTable"
+    dtonamespace = "fsdl.test"
+    dtobase = Some("IDTO")
+    cols = [Identity("ID", INT, 1, 1)
+            Null("Name", CHR(16))
+            NotNull("Index", INT, VAL(100))
+            NotNull("Active", BIT, FALSE)
+            Null("Price", MONEY)
+            Null("Description", TEXT)
+            NotNull("FKID", INT, NONE)] 
+    constraints = [ASC("ID")]
+    fks = [ForeignKey("FKID", "tFKTable", "ID")] 
+    dapperext = true
+}
     
 let testTable2 = {
-        stype=CREATE
-        name="tCreatedTable2"
-        cols = [Identity("ID", INT, 1, 1)
-                Null("Name", CHR(16))
-                NotNull("Index", INT, VAL(100))
-                NotNull("Active", BIT, FALSE)
-                Null("Price", MONEY)
-                Null("Description", TEXT)
-                NotNull("FKID", INT, NONE)] 
-        constraints = [ASC("ID")]
-        fks = [ForeignKey("FKID", "tFKTable", "ID")] 
-    }
+    stype=CREATE
+    name="tCreatedTable2"
+    dtoname = "CreatedTable"
+    dtonamespace = "fsdl.test"
+    dtobase = None
+    cols = [Identity("ID", INT, 1, 1)
+            Null("Name", CHR(16))
+            NotNull("Index", INT, VAL(100))
+            NotNull("Active", BIT, FALSE)
+            Null("Price", MONEY)
+            Null("Description", TEXT)
+            NotNull("FKID", INT, NONE)] 
+    constraints = [ASC("ID")]
+    fks = [ForeignKey("FKID", "tFKTable", "ID")]
+    dapperext = true
+}
 
 module CSharpGenerator = 
     let indent = sprintf "    %s"
