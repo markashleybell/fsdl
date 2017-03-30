@@ -37,16 +37,16 @@ module internal SqlGenerator =
     let columnDefinition table columnSpec = 
         match columnSpec with
         | Null (columnName, dataType) -> sprintf "%s NULL" (column columnName dataType)
-        | NotNull (columnName, dataType, columnDefault') -> sprintf "%s NOT NULL%s" (column columnName dataType) (columnDefault table.name columnName columnDefault')
+        | NotNull (columnName, dataType, columnDefault') -> sprintf "%s NOT NULL%s" (column columnName dataType) (columnDefault table.tableName columnName columnDefault')
         | Identity (columnName, dataType, initialValue, increment) -> sprintf "%s IDENTITY(%i,%i) NOT NULL" (column columnName dataType) initialValue increment
     
     // All column definitions for a table
     let columnDefinitions columnSpecifications table = 
         columnSpecifications
-        |> List.append table.cols
+        |> List.append table.columnSpecifications
         |> List.map (columnDefinition table)
         |> String.concat commabr
-        |> (fun s -> match table.stype with 
+        |> (fun s -> match table.sqlStatementType with 
                      | CREATE -> sprintf "%s" s
                      | ALTER -> sprintf "%s" s)
 
@@ -60,10 +60,10 @@ module internal SqlGenerator =
 
     // List of constraint statements for a table
     let constraintStatements commonConstraints table =
-        let comment = sprintf "-- Create %s constraints" table.name
+        let comment = sprintf "-- Create %s constraints" table.tableName
         let constraintList = commonConstraints
-                             |> List.append table.constraints
-                             |> List.map (constraintStatement table.name)
+                             |> List.append table.constraintSpecifications
+                             |> List.map (constraintStatement table.tableName)
 
         match constraintList with
         | [] -> ""
@@ -71,21 +71,21 @@ module internal SqlGenerator =
 
     // CREATE and ALTER statement generators
     let createStatement commonColumns table = 
-        let comment = sprintf "-- Create %s" table.name
-        let create = sprintf "CREATE TABLE [%s] (" table.name
+        let comment = sprintf "-- Create %s" table.tableName
+        let create = sprintf "CREATE TABLE [%s] (" table.tableName
 
         [comment; create; (columnDefinitions commonColumns table); ")"] 
         |> String.concat br
 
     let alterStatement commonColumns table = 
-        let comment = sprintf "-- Alter %s" table.name
-        let alter = sprintf "ALTER TABLE [%s] ADD" table.name
+        let comment = sprintf "-- Alter %s" table.tableName
+        let alter = sprintf "ALTER TABLE [%s] ADD" table.tableName
 
         [comment; alter; (columnDefinitions commonColumns table)] 
         |> String.concat br
 
     let tableDefinition commonColumns table =
-        match table.stype with
+        match table.sqlStatementType with
         | CREATE -> createStatement commonColumns table
         | ALTER -> alterStatement commonColumns table
 

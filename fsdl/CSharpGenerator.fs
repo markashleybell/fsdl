@@ -58,12 +58,12 @@ module internal CSharpGenerator =
     let properties commonColumns table = 
         // If a base class is being used, don't add the
         // common columns to the generated DTO classes
-        let columns = match table.dtobase with
+        let columns = match table.dtoBaseClassName with
                       | Some s -> []
                       | None -> commonColumns
         columns
-        |> List.append table.cols
-        |> List.map (propertyDefinition table.dapperext (isPrimaryKey table.constraints))
+        |> List.append table.columnSpecifications
+        |> List.map (propertyDefinition table.addDapperAttributes (isPrimaryKey table.constraintSpecifications))
         |> String.concat br
         |> (fun s -> sprintf "%s" s)
 
@@ -72,13 +72,13 @@ module internal CSharpGenerator =
             "using System;"
             "using System.ComponentModel.DataAnnotations;"
         ]
-        let allusings = match table.dapperext with
+        let allusings = match table.addDapperAttributes with
                         | false -> usings
                         | true -> usings @ ["using d = Dapper.Contrib.Extensions;"]
         let code = [
             allusings |> String.concat br
             ""
-            sprintf "namespace %s" table.dtonamespace
+            sprintf "namespace %s" table.dtoNamespace
             "{"
             "%s"
             "}"
@@ -91,15 +91,15 @@ module internal CSharpGenerator =
         let classattr dap arr = 
             match dap with
                   | false -> arr
-                  | true -> (indent (sprintf "[d.Table(\"%s\")]" table.name))::arr
-        let basecls = match table.dtobase with
+                  | true -> (indent (sprintf "[d.Table(\"%s\")]" table.tableName))::arr
+        let basecls = match table.dtoBaseClassName with
                       | Some s -> sprintf " : %s" s
                       | None -> ""
-        let cls = indent (sprintf "public class %s%s%s%s" table.dtoname basecls br (indent "{"))
+        let cls = indent (sprintf "public class %s%s%s%s" table.dtoClassName basecls br (indent "{"))
         let def = [cls; (properties commonColumns table); (indent "}")] 
-                  |> (classattr table.dapperext)
+                  |> (classattr table.addDapperAttributes)
                   |> String.concat br
-        (table.dtoname, sprintf (namespaces table) def)
+        (table.dtoClassName, sprintf (namespaces table) def)
 
     let classDefinitions tableList commonColumns =
         tableList |> List.map (classDefinition commonColumns)

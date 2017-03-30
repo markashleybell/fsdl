@@ -22,13 +22,13 @@ type IndexSpec =
     | NonClusteredUniqueIndex of string
 
 type Table = {
-    name:string; 
-    dtoname:string; 
-    dtonamespace:string;
-    dtobase:string option;
-    stype:StatementType; 
-    cols:ColSpec list; 
-    constraints:ConstraintSpec list; 
-    indexes:IndexSpec list;
-    dapperext:bool;
+    tableName:string; 
+    dtoClassName:string; 
+    dtoNamespace:string;
+    dtoBaseClassName:string option;
+    sqlStatementType:StatementType; 
+    columnSpecifications:ColSpec list; 
+    constraintSpecifications:ConstraintSpec list; 
+    indexSpecifications:IndexSpec list;
+    addDapperAttributes:bool;
 }

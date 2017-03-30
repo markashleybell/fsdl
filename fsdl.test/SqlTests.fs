@@ -6,31 +6,31 @@ open System
 open fsdl
 
 module TestSqlData = 
-    let commoncols = [NotNull("CommonDate", DATE, NOW)
-                      NotNull("CommonFKID", INT, VAL(1))]
+    let commonColumns = [NotNull("CommonDate", DATE, NOW)
+                         NotNull("CommonFKID", INT, VAL(1))]
     
-    let commonfks = [ForeignKey("CommonFKID", "tCommonFKTable", "ID")]
+    let commonConstraints = [ForeignKey("CommonFKID", "tCommonFKTable", "ID")]
 
     let testTable = {
-            stype = CREATE
-            name = "tCreatedTable"
-            dtoname = "CreatedTable"
-            dtonamespace = "test.com.DTO"
-            dtobase = Some "DTOBase"
-            cols = [Identity("ID", INT, 1, 1)
-                    Null("Name", CHR(16))
-                    NotNull("GUID", GUID, NEWGUID)
-                    NotNull("Date", DATE, NOW)
-                    NotNull("Index", INT, VAL(100))
-                    NotNull("Active", BIT, FALSE)
-                    Null("Price", MONEY)
-                    Null("Description", TEXT)
-                    Null("FKID", INT)] 
-            constraints = [PrimaryKey("ID")
-                           ForeignKey("FKID", "tFKTable", "ID")]
-            indexes = []
-            dapperext = true
-        }
+        sqlStatementType = CREATE
+        tableName = "tCreatedTable"
+        dtoClassName = "CreatedTable"
+        dtoNamespace = "test.com.DTO"
+        dtoBaseClassName = Some "DTOBase"
+        columnSpecifications = [Identity("ID", INT, 1, 1)
+                                Null("Name", CHR(16))
+                                NotNull("GUID", GUID, NEWGUID)
+                                NotNull("Date", DATE, NOW)
+                                NotNull("Index", INT, VAL(100))
+                                NotNull("Active", BIT, FALSE)
+                                Null("Price", MONEY)
+                                Null("Description", TEXT)
+                                Null("FKID", INT)] 
+        constraintSpecifications = [PrimaryKey("ID")
+                                    ForeignKey("FKID", "tFKTable", "ID")]
+        indexSpecifications = []
+        addDapperAttributes = true
+    }
 
     let expectedCreateTableDefinitions = """-- Create tCreatedTable
 CREATE TABLE [tCreatedTable] (
@@ -72,7 +72,7 @@ type ``Basic SQL output tests`` () =
     [<Test>] 
     member test.``Check CREATE TABLE output against reference`` () =
         let sql = fsdl.generateTableDefinitions 
-                    [TestSqlData.testTable] TestSqlData.commoncols
+                    [TestSqlData.testTable] TestSqlData.commonColumns
 
         sql |> Console.WriteLine |> ignore
         sql |> should equal TestSqlData.expectedCreateTableDefinitions
@@ -80,7 +80,7 @@ type ``Basic SQL output tests`` () =
     [<Test>] 
     member test.``Check FK output against reference`` () =
         let sql = fsdl.generateConstraintDefinitions 
-                    [TestSqlData.testTable] TestSqlData.commonfks
+                    [TestSqlData.testTable] TestSqlData.commonConstraints
 
         sql |> Console.WriteLine |> ignore
         sql |> should equal TestSqlData.expectedConstraintDefinitions
@@ -89,7 +89,7 @@ type ``Basic SQL output tests`` () =
 
     member test.``Check combined CREATE TABLE and FK output against reference`` () =
         let sql = fsdl.generateTableAndConstraintDefinitions 
-                    [TestSqlData.testTable] TestSqlData.commoncols TestSqlData.commonfks
+                    [TestSqlData.testTable] TestSqlData.commonColumns TestSqlData.commonConstraints
 
         sql |> Console.WriteLine |> ignore
         sql |> should equal TestSqlData.expectedCreateTableAndConstraintDefinitions

@@ -1,5 +1,5 @@
 <Query Kind="FSharpProgram">
-  <Reference Relative="fsdl\bin\Debug\fsdl.dll">E:\Src\fsdl\fsdl\bin\Debug\fsdl.dll</Reference>
+  <Reference Relative="fsdl\bin\Debug\fsdl.dll">C:\Src\fsdl\fsdl\bin\Debug\fsdl.dll</Reference>
   <Namespace>fsdl</Namespace>
 </Query>
 
@@ -9,23 +9,23 @@ let commonColumns = [NotNull("CommonDate", DATE, NOW)
 let commonConstraints = [ForeignKey("CommonFKID", "tCommonFKTable", "ID")]
 
 let testTable = {
-    stype=CREATE
-    name="tCreatedTable"
-    dtoname = "CreatedTable"
-    dtonamespace = "fsdl.test"
-    dtobase = Some("IDTO")
-    cols = [NotNull("ID", GUID, NEWGUID)
-            Identity("IDX", INT, 1, 1)
-            Null("Name", CHR(16))
-            NotNull("Index", INT, VAL(100))
-            NotNull("Active", BIT, FALSE)
-            Null("Price", MONEY)
-            Null("Description", TEXT)
-            NotNull("FKID", INT, NONE)] 
-    constraints = [PrimaryKey("ID")
-                   ForeignKey("FKID", "tFKTable", "ID")]
-    indexes = []
-    dapperext = true
+    sqlStatementType = CREATE
+    tableName = "tCreatedTable"
+    dtoClassName = "CreatedTable"
+    dtoNamespace = "fsdl.test"
+    dtoBaseClassName = Some("IDTO")
+    columnSpecifications = [NotNull("ID", GUID, NEWGUID)
+                            Identity("IDX", INT, 1, 1)
+                            Null("Name", CHR(16))
+                            NotNull("Index", INT, VAL(100))
+                            NotNull("Active", BIT, FALSE)
+                            Null("Price", MONEY)
+                            Null("Description", TEXT)
+                            NotNull("FKID", INT, NONE)] 
+    constraintSpecifications = [PrimaryKey("ID")
+                                ForeignKey("FKID", "tFKTable", "ID")]
+    indexSpecifications = []
+    addDapperAttributes = true
 }
 
 fsdl.generateDTOClassDefinitions [testTable] commonColumns |> Dump |> ignore
