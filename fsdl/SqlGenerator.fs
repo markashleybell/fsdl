@@ -52,7 +52,7 @@ module internal SqlGenerator =
 
     // Constraint statement
     let constraintStatement tableName constraintSpecification = 
-        let primaryKeyDefinition = sprintf "ALTER TABLE [%s] WITH CHECK ADD CONSTRAINT PK_%s%sPRIMARY KEY NONCLUSTERED ([%s])" 
+        let primaryKeyDefinition = sprintf "ALTER TABLE [%s] WITH CHECK ADD CONSTRAINT PK_%s%sPRIMARY KEY CLUSTERED ([%s])" 
         let foreignKeyDefinition = sprintf "ALTER TABLE [%s] WITH CHECK ADD CONSTRAINT FK_%s_%s_%s%sFOREIGN KEY ([%s]) REFERENCES [%s] ([%s])" 
         match constraintSpecification with 
         | PrimaryKey columnName' -> (primaryKeyDefinition tableName tableName br columnName')

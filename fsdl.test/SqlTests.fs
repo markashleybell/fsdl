@@ -53,15 +53,17 @@ PRINT 'Tables Created'
 
 """
 
-    let expectedConstraintDefinitions = """-- Create tCreatedTable foreign keys
-ALTER TABLE [tCreatedTable] WITH CHECK ADD CONSTRAINT FK_tCreatedTable_tFKTable_FKID
+    let expectedConstraintDefinitions = """-- Create tCreatedTable constraints
+ALTER TABLE [tCreatedTable] WITH CHECK ADD CONSTRAINT PK_tCreatedTable
+PRIMARY KEY CLUSTERED ([ID])
+ALTER TABLE [tCreatedTable] WITH CHECK ADD CONSTRAINT FK_tCreatedTable_tFKTable_ID
 FOREIGN KEY ([FKID]) REFERENCES [tFKTable] ([ID])
-ALTER TABLE [tCreatedTable] WITH CHECK ADD CONSTRAINT FK_tCreatedTable_tCommonFKTable_CommonFKID
+ALTER TABLE [tCreatedTable] WITH CHECK ADD CONSTRAINT FK_tCreatedTable_tCommonFKTable_ID
 FOREIGN KEY ([CommonFKID]) REFERENCES [tCommonFKTable] ([ID])
 
 GO
 
-PRINT 'Foreign Keys Created'
+PRINT 'Constraints Created'
 
 """
 
@@ -78,7 +80,7 @@ type ``Basic SQL output tests`` () =
         sql |> should equal TestSqlData.expectedCreateTableDefinitions
 
     [<Test>] 
-    member test.``Check FK output against reference`` () =
+    member test.``Check constraint output against reference`` () =
         let sql = fsdl.generateConstraintDefinitions 
                     [TestSqlData.testTable] TestSqlData.commonConstraints
 
@@ -87,7 +89,7 @@ type ``Basic SQL output tests`` () =
 
     [<Test>] 
 
-    member test.``Check combined CREATE TABLE and FK output against reference`` () =
+    member test.``Check combined CREATE TABLE and constraint output against reference`` () =
         let sql = fsdl.generateTableAndConstraintDefinitions 
                     [TestSqlData.testTable] TestSqlData.commonColumns TestSqlData.commonConstraints
 
