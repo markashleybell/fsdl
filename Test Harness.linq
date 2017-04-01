@@ -22,7 +22,7 @@ let testTable = {
                             Null("Price", MONEY)
                             Null("Description", TEXT)
                             NotNull("FKID", INT, NONE)] 
-    constraintSpecifications = [PrimaryKey("ID")
+    constraintSpecifications = [PrimaryKey(["ID"])
                                 ForeignKey("FKID", "tFKTable", "ID")]
     indexSpecifications = [ClusteredUnique(["IDX"])]
     addDapperAttributes = true

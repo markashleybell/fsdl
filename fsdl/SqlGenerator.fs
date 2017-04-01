@@ -50,12 +50,17 @@ module internal SqlGenerator =
                      | CREATE -> sprintf "%s" s
                      | ALTER -> sprintf "%s" s)
 
+    let buildColumnList format separator cols = 
+        cols 
+        |> List.map (fun col -> sprintf (Printf.StringFormat<string->string>(format)) col) 
+        |> String.concat separator
+
     // Constraint statement
     let constraintStatement tableName constraintSpecification = 
-        let primaryKeyDefinition = sprintf "ALTER TABLE [%s] WITH CHECK ADD CONSTRAINT PK_%s%sPRIMARY KEY ([%s])" 
+        let primaryKeyDefinition = sprintf "ALTER TABLE [%s] WITH CHECK ADD CONSTRAINT PK_%s%sPRIMARY KEY (%s)" 
         let foreignKeyDefinition = sprintf "ALTER TABLE [%s] WITH CHECK ADD CONSTRAINT FK_%s_%s%sFOREIGN KEY ([%s]) REFERENCES [%s] ([%s])" 
         match constraintSpecification with 
-        | PrimaryKey columnName' -> (primaryKeyDefinition tableName tableName br columnName')
+        | PrimaryKey columnList -> (primaryKeyDefinition tableName tableName br (buildColumnList "[%s]" ", " columnList))
         | ForeignKey (columnName', fkTable, fkColumn) -> (foreignKeyDefinition tableName tableName fkTable br columnName' fkTable fkColumn)
 
     // List of constraint statements for a table
@@ -70,10 +75,6 @@ module internal SqlGenerator =
         | constraints -> sprintf "%s%s" (comment::constraints |> String.concat br) br
 
     let indexStatement tableName indexSpecification =
-        let buildColumnList format separator cols = 
-            cols 
-            |> List.map (fun col -> sprintf (Printf.StringFormat<string->string>(format)) col) 
-            |> String.concat separator
         let indexType, columnList = match indexSpecification with
                                     | NonClustered cols -> ("", cols)
                                     | NonClusteredUnique cols -> (" UNIQUE", cols)

@@ -12,7 +12,7 @@ type ColSpec =
     | Identity of string * DataType * int * int
 
 type ConstraintSpec = 
-    | PrimaryKey of string
+    | PrimaryKey of string list
     | ForeignKey of string * string * string
 
 type IndexSpec = 

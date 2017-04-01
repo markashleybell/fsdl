@@ -50,10 +50,10 @@ module internal CSharpGenerator =
         
     let isPrimaryKey constraints columnName = 
         let primaryKeys = constraints 
-                          |> List.choose (fun c -> match c with
-                                                   | PrimaryKey columnName' -> Some(columnName')
-                                                   | ForeignKey (columnName', fkTable, fkColumn) -> None)
-        primaryKeys |> List.contains columnName
+                          |> List.map (fun c -> match c with
+                                                | PrimaryKey columnList -> columnList |> List.contains columnName
+                                                | ForeignKey _ -> false)
+        primaryKeys |> List.contains true
 
     let properties commonColumns table = 
         // If a base class is being used, don't add the

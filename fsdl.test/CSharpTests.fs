@@ -26,7 +26,7 @@ module TestCSharpData =
                                 Null("Price", MONEY)
                                 Null("Description", TEXT)
                                 Null("FKID", INT)] 
-        constraintSpecifications = [PrimaryKey("ID")
+        constraintSpecifications = [PrimaryKey(["ID"])
                                     ForeignKey("FKID", "tFKTable", "ID")]
         indexSpecifications = []
         addDapperAttributes = true
