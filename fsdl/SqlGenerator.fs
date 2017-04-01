@@ -69,6 +69,27 @@ module internal SqlGenerator =
         | [] -> ""
         | constraints -> sprintf "%s%s" (comment::constraints |> String.concat br) br
 
+    let indexStatement tableName indexSpecification =
+        let buildColumnList format separator cols = 
+            cols 
+            |> List.map (fun col -> sprintf (Printf.StringFormat<string->string>(format)) col) 
+            |> String.concat separator
+        let indexType, columnList = match indexSpecification with
+                                    | NonClustered cols -> ("", cols)
+                                    | NonClusteredUnique cols -> (" UNIQUE", cols)
+                                    | Clustered cols -> (" CLUSTERED", cols)
+                                    | ClusteredUnique cols -> (" UNIQUE CLUSTERED", cols)
+        sprintf "CREATE%s INDEX IX_%s_%s ON [%s] (%s)" 
+            indexType tableName (buildColumnList "%s" "_" columnList) tableName (buildColumnList "[%s]" ", " columnList)
+
+    let indexStatements table = 
+        let comment = sprintf "-- Create %s indexes" table.tableName
+        let indexList = table.indexSpecifications
+                        |> List.map (indexStatement table.tableName)
+        match indexList with
+        | [] -> ""
+        | indexes -> sprintf "%s%s" (comment::indexes |> String.concat br) br
+
     // CREATE and ALTER statement generators
     let createStatement commonColumns table = 
         let comment = sprintf "-- Create %s" table.tableName
@@ -100,6 +121,12 @@ module internal SqlGenerator =
         |> List.filter (fun s -> s <> "")
         |> String.concat br
 
+    let indexDefinitions tableList =
+        tableList
+        |> List.map indexStatements
+        |> List.filter (fun s -> s <> "")
+        |> String.concat br
+
     let generateTableDefinitions tableList commonColumns = 
         sprintf "%s%sGO%s%s%s" 
             (tableDefinitions tableList commonColumns) brbr brbr "PRINT 'Tables Created'" brbr
@@ -108,7 +135,6 @@ module internal SqlGenerator =
         sprintf "%s%sGO%s%s%s" 
             (constraintDefinitions tableList commonConstraints) br brbr "PRINT 'Constraints Created'" brbr
 
-    let generateTableAndConstraintDefinitions tables commonColumns commonConstraints = 
-        sprintf "%s%s" 
-            (generateTableDefinitions tables commonColumns) 
-            (generateConstraintDefinitions tables commonConstraints)
+    let generateIndexDefinitions tableList = 
+        sprintf "%s%sGO%s%s%s" 
+            (indexDefinitions tableList) br brbr "PRINT 'Indexes Created'" brbr

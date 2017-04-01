@@ -16,10 +16,10 @@ type ConstraintSpec =
     | ForeignKey of string * string * string
 
 type IndexSpec = 
-    | ClusteredIndex of string
-    | ClusteredUniqueIndex of string
-    | NonClusteredIndex of string
-    | NonClusteredUniqueIndex of string
+    | Clustered of string list
+    | ClusteredUnique of string list
+    | NonClustered of string list
+    | NonClusteredUnique of string list
 
 type Table = {
     tableName:string; 

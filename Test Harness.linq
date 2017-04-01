@@ -24,7 +24,7 @@ let testTable = {
                             NotNull("FKID", INT, NONE)] 
     constraintSpecifications = [PrimaryKey("ID")
                                 ForeignKey("FKID", "tFKTable", "ID")]
-    indexSpecifications = []
+    indexSpecifications = [ClusteredUnique(["IDX"])]
     addDapperAttributes = true
 }
 
@@ -32,6 +32,6 @@ fsdl.generateDTOClassDefinitions [testTable] commonColumns |> Dump |> ignore
 
 fsdl.generateTableDefinitions [testTable] commonColumns |> Dump |> ignore
 
-fsdl.generateConstraintDefinitions [testTable] commonConstraints |> Dump |> ignore
+fsdl.generateIndexDefinitions [testTable] |> Dump |> ignore
 
-fsdl.generateTableAndConstraintDefinitions [testTable] commonColumns commonConstraints |> Dump |> ignore
+fsdl.generateConstraintDefinitions [testTable] commonConstraints |> Dump |> ignore

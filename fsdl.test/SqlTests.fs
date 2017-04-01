@@ -28,7 +28,7 @@ module TestSqlData =
                                 Null("FKID", INT)] 
         constraintSpecifications = [PrimaryKey("ID")
                                     ForeignKey("FKID", "tFKTable", "ID")]
-        indexSpecifications = []
+        indexSpecifications = [ClusteredUnique(["ID"])]
         addDapperAttributes = true
     }
 
@@ -67,7 +67,14 @@ PRINT 'Constraints Created'
 
 """
 
-    let expectedCreateTableAndConstraintDefinitions = expectedCreateTableDefinitions + expectedConstraintDefinitions
+    let expectedIndexDefinitions = """-- Create tCreatedTable indexes
+CREATE UNIQUE CLUSTERED INDEX IX_tCreatedTable_ID ON [tCreatedTable] ([ID])
+
+GO
+
+PRINT 'Indexes Created'
+
+"""
 
 [<TestFixture>]
 type ``Basic SQL output tests`` () =
@@ -86,12 +93,11 @@ type ``Basic SQL output tests`` () =
 
         sql |> Console.WriteLine |> ignore
         sql |> should equal TestSqlData.expectedConstraintDefinitions
-
+    
     [<Test>] 
-
-    member test.``Check combined CREATE TABLE and constraint output against reference`` () =
-        let sql = fsdl.generateTableAndConstraintDefinitions 
-                    [TestSqlData.testTable] TestSqlData.commonColumns TestSqlData.commonConstraints
+    member test.``Check index output against reference`` () =
+        let sql = fsdl.generateIndexDefinitions 
+                    [TestSqlData.testTable]
 
         sql |> Console.WriteLine |> ignore
-        sql |> should equal TestSqlData.expectedCreateTableAndConstraintDefinitions
+        sql |> should equal TestSqlData.expectedIndexDefinitions
