@@ -30,14 +30,14 @@ module internal CSharpGenerator =
         | true -> sprintf "%s?" propertyName
 
     let propertyDefinition addDapperAttributes isPrimaryKey column = 
-        let (propertyName, isPrimaryKey', isExplicitKey, isNullable, dataType) = 
+        let (propertyName, isPrimaryKey', isExplicitKey, isNullable, isNonKeyIdentity, dataType) = 
             match column with
-            | Null (columnName, dataType) -> (columnName, false, false, true, dataType)
-            | NotNull (columnName, dataType, d) -> (columnName, (isPrimaryKey columnName), true, false, dataType)
-            | Identity (columnName, dataType, initialValue, increment) -> (columnName, (isPrimaryKey columnName), false, false, dataType)
+            | Null (columnName, dataType) -> (columnName, false, false, true, false, dataType)
+            | NotNull (columnName, dataType, d) -> (columnName, (isPrimaryKey columnName), true, false, false, dataType)
+            | Identity (columnName, dataType, initialValue, increment) -> (columnName, (isPrimaryKey columnName), false, false, (not (isPrimaryKey columnName)), dataType)
                                    
         let (validationAttributes, cSharpDataType) = match dataType with
-                                                     | INT -> ([], "int" |> nullableDataType isNullable)
+                                                     | INT -> ((if addDapperAttributes && isNonKeyIdentity then ["[d.Computed]"] else []), "int" |> nullableDataType isNullable)
                                                      | BIT -> ([], "bool" |> nullableDataType isNullable)
                                                      | MONEY -> ([], "decimal" |> nullableDataType isNullable)
                                                      | DATE -> ([], "DateTime" |> nullableDataType isNullable)
