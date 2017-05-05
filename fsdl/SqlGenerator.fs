@@ -58,10 +58,10 @@ module internal SqlGenerator =
     // Constraint statement
     let constraintStatement tableName constraintSpecification = 
         let primaryKeyDefinition = sprintf "ALTER TABLE [%s] WITH CHECK ADD CONSTRAINT PK_%s%sPRIMARY KEY (%s)" 
-        let foreignKeyDefinition = sprintf "ALTER TABLE [%s] WITH CHECK ADD CONSTRAINT FK_%s_%s%sFOREIGN KEY ([%s]) REFERENCES [%s] ([%s])" 
+        let foreignKeyDefinition = sprintf "ALTER TABLE [%s] WITH CHECK ADD CONSTRAINT FK_%s_%s_%s_%s%sFOREIGN KEY ([%s]) REFERENCES [%s] ([%s])" 
         match constraintSpecification with 
         | PrimaryKey columnList -> (primaryKeyDefinition tableName tableName br (buildColumnList "[%s]" ", " columnList))
-        | ForeignKey (columnName', fkTable, fkColumn) -> (foreignKeyDefinition tableName tableName fkTable br columnName' fkTable fkColumn)
+        | ForeignKey (columnName', fkTable, fkColumn) -> (foreignKeyDefinition tableName tableName columnName' fkTable fkColumn br columnName' fkTable fkColumn)
 
     // List of constraint statements for a table
     let constraintStatements commonConstraints table =

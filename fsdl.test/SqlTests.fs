@@ -56,9 +56,9 @@ PRINT 'Tables Created'
     let expectedConstraintDefinitions = """-- Create tCreatedTable constraints
 ALTER TABLE [tCreatedTable] WITH CHECK ADD CONSTRAINT PK_tCreatedTable
 PRIMARY KEY ([ID])
-ALTER TABLE [tCreatedTable] WITH CHECK ADD CONSTRAINT FK_tCreatedTable_tFKTable
+ALTER TABLE [tCreatedTable] WITH CHECK ADD CONSTRAINT FK_tCreatedTable_FKID_tFKTable_ID
 FOREIGN KEY ([FKID]) REFERENCES [tFKTable] ([ID])
-ALTER TABLE [tCreatedTable] WITH CHECK ADD CONSTRAINT FK_tCreatedTable_tCommonFKTable
+ALTER TABLE [tCreatedTable] WITH CHECK ADD CONSTRAINT FK_tCreatedTable_CommonFKID_tCommonFKTable_ID
 FOREIGN KEY ([CommonFKID]) REFERENCES [tCommonFKTable] ([ID])
 
 GO
