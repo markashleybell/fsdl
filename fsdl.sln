@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.27004.2006
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "fsdl", "fsdl\fsdl.fsproj", "{38542D9B-D626-443B-B2C8-A3E80877DE4C}"
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "fsdl", "fsdl\fsdl.fsproj", "{C36289D3-E689-4C5E-B7D7-CDFD7D27B0D0}"
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "fsdl.test", "fsdl.test\fsdl.test.fsproj", "{C12355CB-D087-4B57-851C-824B1DF0061B}"
 EndProject
@@ -13,10 +13,10 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{38542D9B-D626-443B-B2C8-A3E80877DE4C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{38542D9B-D626-443B-B2C8-A3E80877DE4C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{38542D9B-D626-443B-B2C8-A3E80877DE4C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{38542D9B-D626-443B-B2C8-A3E80877DE4C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C36289D3-E689-4C5E-B7D7-CDFD7D27B0D0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C36289D3-E689-4C5E-B7D7-CDFD7D27B0D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C36289D3-E689-4C5E-B7D7-CDFD7D27B0D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C36289D3-E689-4C5E-B7D7-CDFD7D27B0D0}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C12355CB-D087-4B57-851C-824B1DF0061B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C12355CB-D087-4B57-851C-824B1DF0061B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C12355CB-D087-4B57-851C-824B1DF0061B}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -24,5 +24,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4E730C89-65A0-4DF7-BFFD-9542550ABE46}
 	EndGlobalSection
 EndGlobal

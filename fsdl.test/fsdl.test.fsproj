@@ -82,7 +82,7 @@
   <ItemGroup>
     <ProjectReference Include="..\fsdl\fsdl.fsproj">
       <Name>fsdl</Name>
-      <Project>{38542d9b-d626-443b-b2c8-a3e80877de4c}</Project>
+      <Project>{c36289d3-e689-4c5e-b7d7-cdfd7d27b0d0}</Project>
       <Private>True</Private>
     </ProjectReference>
   </ItemGroup>
