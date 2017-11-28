@@ -51,6 +51,7 @@
   <Import Project="$(FSharpTargetsPath)" />
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
+    <Compile Include="Utils.fs" />
     <Compile Include="SqlTypes.fs" />
     <Compile Include="CSharpGenerator.fs" />
     <Compile Include="SqlGenerator.fs" />

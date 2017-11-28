@@ -1,10 +1,12 @@
 ﻿namespace fsdl
 
 open System
+open Utils
 
 module internal CSharpGenerator = 
     let indent = sprintf "    %s"
     let indent2 = indent >> indent 
+    let indent3 = indent >> indent2
     let br = Environment.NewLine // Shorthand for newline
     let brbr = br + br
     let scbr = sprintf ";%s" br // Shorthand for semicolon followed by newline
@@ -87,6 +89,51 @@ module internal CSharpGenerator =
         let tmp = code |> String.concat br
         Printf.StringFormat<string->string>(tmp)
 
+    let constructorParam column = 
+        let (propertyName, isNullable, dataType) = 
+            match column with
+            | Null (columnName, dataType) -> (columnName, true, dataType)
+            | NotNull (columnName, dataType, d) -> (columnName, false, dataType)
+            | Identity (columnName, dataType, initialValue, increment) -> (columnName, false, dataType)
+                                   
+        let cSharpDataType = match dataType with
+                             | INT -> ("int" |> nullableDataType isNullable)
+                             | BIT -> ("bool" |> nullableDataType isNullable)
+                             | MONEY -> ("decimal" |> nullableDataType isNullable)
+                             | DATE -> ("DateTime" |> nullableDataType isNullable)
+                             | CHR l -> ("string")
+                             | TEXT -> ("string")
+                             | GUID -> ("Guid" |> nullableDataType isNullable)
+                      
+        sprintf "%s %s" cSharpDataType (niceCamelName propertyName)
+
+    let assignment column = 
+        let propertyName = 
+            match column with
+            | Null (columnName, _) -> columnName
+            | NotNull (columnName, dataType, d) -> columnName
+            | Identity (columnName, dataType, initialValue, increment) -> columnName
+        sprintf "%s = %s;" (indent3 propertyName) (niceCamelName propertyName)
+
+    let constructorDefinition commonColumns table = 
+        // If a base class is being used, don't add the
+        // common columns to the generated DTO classes
+        let columns = match table.dtoBaseClassName with
+                      | Some s -> []
+                      | None -> commonColumns
+
+        let c = columns
+                |> List.append table.columnSpecifications
+                |> List.map constructorParam
+                |> String.concat ", "
+        
+        let a = columns
+                |> List.append table.columnSpecifications
+                |> List.map assignment
+                |> String.concat br
+
+        sprintf "%s %s(%s)%s%s%s%s%s%s%s" (indent2 "public") table.dtoClassName c br (indent2 "{") br a br (indent2 "}") br
+
     let classDefinition commonColumns table = 
         let classattr dap arr = 
             match dap with
@@ -96,7 +143,7 @@ module internal CSharpGenerator =
                       | Some s -> sprintf " : %s" s
                       | None -> ""
         let cls = indent (sprintf "public class %s%s%s%s" table.dtoClassName basecls br (indent "{"))
-        let def = [cls; (properties commonColumns table); (indent "}")] 
+        let def = [cls; (constructorDefinition commonColumns table); (properties commonColumns table); (indent "}")] 
                   |> (classattr table.addDapperAttributes)
                   |> String.concat br
         (table.dtoClassName, sprintf (namespaces table) def)
