@@ -31,7 +31,7 @@ module internal CSharpGenerator =
         | false -> propertyName
         | true -> sprintf "%s?" propertyName
 
-    let propertyDefinition addDapperAttributes isPrimaryKey column = 
+    let propertyDefinition immutable addDapperAttributes isPrimaryKey column = 
         let (propertyName, isPrimaryKey', isExplicitKey, isNullable, isNonKeyIdentity, dataType) = 
             match column with
             | Null (columnName, dataType) -> (columnName, false, false, true, false, dataType)
@@ -46,9 +46,12 @@ module internal CSharpGenerator =
                                                      | CHR l -> ([sprintf "[StringLength(%i)]" l], "string")
                                                      | TEXT -> ([], "string")
                                                      | GUID -> ([], "Guid" |> nullableDataType isNullable)
-                      
-        sprintf "%s%s %s %s { get; set; }" 
-                    (attributes isPrimaryKey' isExplicitKey addDapperAttributes validationAttributes) (indent2 "public") cSharpDataType propertyName
+        let setter = match immutable with
+                     | true -> ""
+                     | false -> "set; "
+
+        sprintf "%s%s %s %s { get; %s}" 
+                    (attributes isPrimaryKey' isExplicitKey addDapperAttributes validationAttributes) (indent2 "public") cSharpDataType propertyName setter
         
     let isPrimaryKey constraints columnName = 
         let primaryKeys = constraints 
@@ -65,7 +68,7 @@ module internal CSharpGenerator =
                       | None -> commonColumns
         columns
         |> List.append table.columnSpecifications
-        |> List.map (propertyDefinition table.addDapperAttributes (isPrimaryKey table.constraintSpecifications))
+        |> List.map (propertyDefinition table.immutable table.addDapperAttributes (isPrimaryKey table.constraintSpecifications))
         |> String.concat br
         |> (fun s -> sprintf "%s" s)
 

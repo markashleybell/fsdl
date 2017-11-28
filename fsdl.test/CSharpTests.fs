@@ -56,16 +56,16 @@ namespace test.com.DTO
         }
 
         [d.Key]
-        public int ID { get; set; }
+        public int ID { get; }
         [StringLength(16)]
-        public string Name { get; set; }
-        public Guid GUID { get; set; }
-        public DateTime Date { get; set; }
-        public int Index { get; set; }
-        public bool Active { get; set; }
-        public decimal? Price { get; set; }
-        public string Description { get; set; }
-        public int? FKID { get; set; }
+        public string Name { get; }
+        public Guid GUID { get; }
+        public DateTime Date { get; }
+        public int Index { get; }
+        public bool Active { get; }
+        public decimal? Price { get; }
+        public string Description { get; }
+        public int? FKID { get; }
     }
 }
 """
