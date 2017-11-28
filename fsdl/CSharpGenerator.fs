@@ -142,8 +142,11 @@ module internal CSharpGenerator =
         let basecls = match table.dtoBaseClassName with
                       | Some s -> sprintf " : %s" s
                       | None -> ""
-        let cls = indent (sprintf "public class %s%s%s%s" table.dtoClassName basecls br (indent "{"))
-        let def = [cls; (constructorDefinition commonColumns table); (properties commonColumns table); (indent "}")] 
+        let constructor = match table.immutable with
+                          | false -> ""
+                          | true -> sprintf "%s%s" br (constructorDefinition commonColumns table)
+        let cls = indent (sprintf "public class %s%s%s%s%s" table.dtoClassName basecls br (indent "{") constructor) 
+        let def = [cls; (properties commonColumns table); (indent "}")] 
                   |> (classattr table.addDapperAttributes)
                   |> String.concat br
         (table.dtoClassName, sprintf (namespaces table) def)

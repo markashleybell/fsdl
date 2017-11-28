@@ -30,6 +30,7 @@ module TestCSharpData =
                                     ForeignKey("FKID", "tFKTable", "ID")]
         indexSpecifications = []
         addDapperAttributes = true
+        immutable = false
     }
 
     let expectedClassDefinitions = """using System;

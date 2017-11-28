@@ -31,4 +31,5 @@ type Table = {
     constraintSpecifications:ConstraintSpec list; 
     indexSpecifications:IndexSpec list;
     addDapperAttributes:bool;
+    immutable:bool;
 }
