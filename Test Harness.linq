@@ -18,8 +18,8 @@ let testTable = {
                             Identity("IDX", INT, 1, 1)
                             Null("Name", CHR(16))
                             NotNull("Index", INT, VAL(100))
-                            NotNull("Active", BIT, FALSE)
-                            Null("Price", MONEY)
+                            NotNull("IsActive", BIT, FALSE)
+                            Null("TotalPrice", MONEY)
                             Null("Description", TEXT)
                             NotNull("FKID", INT, NONE)] 
     constraintSpecifications = [PrimaryKey(["ID"])
