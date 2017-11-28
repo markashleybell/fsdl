@@ -1,8 +1,6 @@
 ﻿namespace fsdl
 
 open System
-open System.Globalization
-open System.Collections.Generic
 
 module Utils =
     // --------------------------------------------------------------------------------------
@@ -14,6 +12,9 @@ module Utils =
     let private (|LetterDigit|_|) = sat Char.IsLetterOrDigit
     let private (|Upper|_|) = sat (fun c -> Char.IsUpper c || Char.IsDigit c)
     let private (|Lower|_|) = sat (fun c -> Char.IsLower c || Char.IsDigit c)
+    let private (|IDSuffix|OtherSuffix|) (s:string) = 
+        let us = s.ToUpperInvariant()
+        if us <> "ID" && us <> "GUID" && us.EndsWith("ID") then IDSuffix else OtherSuffix
 
     // --------------------------------------------------------------------------------------
 
@@ -48,11 +49,15 @@ module Utils =
             yield! restart i }
     
       // Split string into segments and turn them to PascalCase
-      seq { for i1, i2 in restart 0 do 
-              let sub = s.Substring(i1, i2 - i1) 
-              if Array.forall Char.IsLetterOrDigit (sub.ToCharArray()) then
-                yield sub.[0].ToString().ToUpperInvariant() + sub.ToLowerInvariant().Substring(1) }
-      |> String.Concat
+      let output = seq { for i1, i2 in restart 0 do 
+                              let sub = s.Substring(i1, i2 - i1) 
+                              if Array.forall Char.IsLetterOrDigit (sub.ToCharArray()) then
+                                yield sub.[0].ToString().ToUpperInvariant() + sub.ToLowerInvariant().Substring(1) }
+                      |> String.Concat
+
+      match output with
+      | OtherSuffix -> output
+      | IDSuffix -> output.Substring(0, output.Length - 2) + "ID"
 
     /// Turns a given non-empty string into a nice 'camelCase' identifier
     let niceCamelName (s:string) = 
