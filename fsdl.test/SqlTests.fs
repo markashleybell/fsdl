@@ -30,7 +30,7 @@ module TestSqlData =
                                     ForeignKey("FKID", "tFKTable", "ID")]
         indexSpecifications = [ClusteredUnique(["ID"])]
         addDapperAttributes = true
-        immutable = false
+        immutable = true
     }
 
     let expectedCreateTableDefinitions = """-- Create tCreatedTable

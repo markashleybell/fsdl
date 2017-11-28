@@ -30,7 +30,7 @@ module TestCSharpData =
                                     ForeignKey("FKID", "tFKTable", "ID")]
         indexSpecifications = []
         addDapperAttributes = true
-        immutable = false
+        immutable = true
     }
 
     let expectedClassDefinitions = """using System;
@@ -42,6 +42,19 @@ namespace test.com.DTO
     [d.Table("tCreatedTable")]
     public class CreatedTable : DTOBase
     {
+        public CreatedTable(int id, string name, Guid guid, DateTime date, int index, bool active, decimal? price, string description, int? fkid)
+        {
+            ID = id;
+            Name = name;
+            GUID = guid;
+            Date = date;
+            Index = index;
+            Active = active;
+            Price = price;
+            Description = description;
+            FKID = fkid;
+        }
+
         [d.Key]
         public int ID { get; set; }
         [StringLength(16)]
