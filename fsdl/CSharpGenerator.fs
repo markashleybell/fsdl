@@ -119,18 +119,12 @@ module internal CSharpGenerator =
         sprintf "%s = %s;" (indent3 propertyName) (niceCamelName propertyName)
 
     let constructorDefinition commonColumns table = 
-        // If a base class is being used, don't add the
-        // common columns to the generated DTO classes
-        let columns = match table.dtoBaseClassName with
-                      | Some s -> []
-                      | None -> commonColumns
-
-        let c = columns
+        let c = commonColumns
                 |> List.append table.columnSpecifications
                 |> List.map constructorParam
                 |> String.concat ", "
         
-        let a = columns
+        let a = commonColumns
                 |> List.append table.columnSpecifications
                 |> List.map assignment
                 |> String.concat br
