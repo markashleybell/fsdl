@@ -32,5 +32,6 @@ type Table = {
     indexSpecifications:IndexSpec list;
     addDapperAttributes:bool;
     generateConstructor:bool;
+    baseConstructorParameters:bool;
     immutable:bool;
 }

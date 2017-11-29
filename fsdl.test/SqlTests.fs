@@ -31,6 +31,7 @@ module TestSqlData =
         indexSpecifications = [ClusteredUnique(["ID"])]
         addDapperAttributes = true
         generateConstructor = true
+        baseConstructorParameters = true
         immutable = true
     }
 

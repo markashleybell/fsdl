@@ -31,6 +31,7 @@ module TestCSharpData =
         indexSpecifications = []
         addDapperAttributes = true
         generateConstructor = true
+        baseConstructorParameters = true
         immutable = true
     }
 

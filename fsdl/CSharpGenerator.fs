@@ -119,12 +119,16 @@ module internal CSharpGenerator =
         sprintf "%s = %s;" (indent3 propertyName) (niceCamelName propertyName)
 
     let constructorDefinition commonColumns table = 
-        let c = commonColumns
+        let columns = match table.baseConstructorParameters with
+                      | false -> []
+                      | true -> commonColumns
+
+        let c = columns
                 |> List.append table.columnSpecifications
                 |> List.map constructorParam
                 |> String.concat ", "
         
-        let a = commonColumns
+        let a = columns
                 |> List.append table.columnSpecifications
                 |> List.map assignment
                 |> String.concat br

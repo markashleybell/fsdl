@@ -1,5 +1,5 @@
 <Query Kind="FSharpProgram">
-  <Reference Relative="fsdl\bin\Debug\fsdl.dll">C:\Src\fsdl\fsdl\bin\Debug\fsdl.dll</Reference>
+  <Reference Relative="fsdl\bin\Debug\fsdl.dll">E:\Src\fsdl\fsdl\bin\Debug\fsdl.dll</Reference>
   <Namespace>fsdl</Namespace>
 </Query>
 
@@ -27,6 +27,7 @@ let testTable = {
     indexSpecifications = [ClusteredUnique(["IDX"])]
     addDapperAttributes = true
     generateConstructor = true
+    baseConstructorParameters = false
     immutable = false
 }
 
