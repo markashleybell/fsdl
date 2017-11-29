@@ -30,6 +30,7 @@ module TestSqlData =
                                     ForeignKey("FKID", "tFKTable", "ID")]
         indexSpecifications = [ClusteredUnique(["ID"])]
         addDapperAttributes = true
+        generateConstructor = true
         immutable = true
     }
 

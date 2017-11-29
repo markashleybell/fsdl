@@ -26,7 +26,8 @@ let testTable = {
                                 ForeignKey("FKID", "tFKTable", "ID")]
     indexSpecifications = [ClusteredUnique(["IDX"])]
     addDapperAttributes = true
-    immutable = true
+    generateConstructor = true
+    immutable = false
 }
 
 fsdl.generateDTOClassDefinitions [testTable] commonColumns |> Dump |> ignore
