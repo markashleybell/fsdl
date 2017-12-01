@@ -14,7 +14,7 @@ module Utils =
     let private (|Lower|_|) = sat (fun c -> Char.IsLower c || Char.IsDigit c)
     let private (|IDSuffix|OtherSuffix|) (s:string) = 
         let us = s.ToUpperInvariant()
-        if us <> "ID" && us <> "GUID" && us.EndsWith("ID") then IDSuffix else OtherSuffix
+        if us <> "ID" && us <> "GUID" && (not (us.EndsWith("GUID"))) && us.EndsWith("ID") then IDSuffix else OtherSuffix
 
     // --------------------------------------------------------------------------------------
 
