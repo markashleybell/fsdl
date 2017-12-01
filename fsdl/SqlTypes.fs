@@ -21,6 +21,8 @@ type IndexSpec =
     | NonClustered of string list
     | NonClusteredUnique of string list
 
+type PropertySetter = PublicSetter | PrivateSetter | NoSetter
+
 type Table = {
     tableName:string; 
     dtoClassName:string; 
@@ -31,7 +33,8 @@ type Table = {
     constraintSpecifications:ConstraintSpec list; 
     indexSpecifications:IndexSpec list;
     addDapperAttributes:bool;
+    partial:bool;
     generateConstructor:bool;
     baseConstructorParameters:bool;
-    immutable:bool;
+    setters:PropertySetter;
 }

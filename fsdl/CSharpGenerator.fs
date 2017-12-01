@@ -31,7 +31,7 @@ module internal CSharpGenerator =
         | false -> propertyName
         | true -> sprintf "%s?" propertyName
 
-    let propertyDefinition immutable addDapperAttributes isPrimaryKey column = 
+    let propertyDefinition setters addDapperAttributes isPrimaryKey column = 
         let (propertyName, isPrimaryKey', isExplicitKey, isNullable, isNonKeyIdentity, dataType) = 
             match column with
             | Null (columnName, dataType) -> (columnName, false, false, true, false, dataType)
@@ -46,9 +46,10 @@ module internal CSharpGenerator =
                                                      | CHR l -> ([sprintf "[StringLength(%i)]" l], "string")
                                                      | TEXT -> ([], "string")
                                                      | GUID -> ([], "Guid" |> nullableDataType isNullable)
-        let setter = match immutable with
-                     | true -> ""
-                     | false -> "set; "
+        let setter = match setters with
+                     | NoSetter -> ""
+                     | PublicSetter -> "set; "
+                     | PrivateSetter -> "private set; "
 
         sprintf "%s%s %s %s { get; %s}" 
                     (attributes isPrimaryKey' isExplicitKey addDapperAttributes validationAttributes) (indent2 "public") cSharpDataType propertyName setter
@@ -68,7 +69,7 @@ module internal CSharpGenerator =
                       | None -> commonColumns
         columns
         |> List.append table.columnSpecifications
-        |> List.map (propertyDefinition table.immutable table.addDapperAttributes (isPrimaryKey table.constraintSpecifications))
+        |> List.map (propertyDefinition table.setters table.addDapperAttributes (isPrimaryKey table.constraintSpecifications))
         |> String.concat br
         |> (fun s -> sprintf "%s" s)
 
@@ -146,7 +147,10 @@ module internal CSharpGenerator =
         let constructor = match table.generateConstructor with
                           | false -> ""
                           | true -> sprintf "%s%s" br (constructorDefinition commonColumns table)
-        let cls = indent (sprintf "public class %s%s%s%s%s" table.dtoClassName basecls br (indent "{") constructor) 
+        let partial = match table.partial with
+                      | false -> ""
+                      | true -> " partial"
+        let cls = indent (sprintf "public%s class %s%s%s%s%s" partial table.dtoClassName basecls br (indent "{") constructor) 
         let def = [cls; (properties commonColumns table); (indent "}")] 
                   |> (classattr table.addDapperAttributes)
                   |> String.concat br

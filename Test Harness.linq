@@ -1,5 +1,5 @@
 <Query Kind="FSharpProgram">
-  <Reference Relative="fsdl\bin\Debug\fsdl.dll">E:\Src\fsdl\fsdl\bin\Debug\fsdl.dll</Reference>
+  <Reference Relative="fsdl\bin\Debug\fsdl.dll">C:\Src\fsdl\fsdl\bin\Debug\fsdl.dll</Reference>
   <Namespace>fsdl</Namespace>
 </Query>
 
@@ -26,9 +26,10 @@ let testTable = {
                                 ForeignKey("FKID", "tFKTable", "ID")]
     indexSpecifications = [ClusteredUnique(["IDX"])]
     addDapperAttributes = true
+    partial = true
     generateConstructor = true
     baseConstructorParameters = false
-    immutable = false
+    setters = PrivateSetter
 }
 
 fsdl.generateDTOClassDefinitions [testTable] commonColumns |> Dump |> ignore

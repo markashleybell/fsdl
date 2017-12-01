@@ -30,9 +30,10 @@ module TestCSharpData =
                                     ForeignKey("FKID", "tFKTable", "ID")]
         indexSpecifications = []
         addDapperAttributes = true
+        partial = true
         generateConstructor = true
         baseConstructorParameters = true
-        immutable = true
+        setters = NoSetter
     }
 
     let expectedClassDefinitions = """using System;
@@ -42,7 +43,7 @@ using d = Dapper.Contrib.Extensions;
 namespace test.com.DTO
 {
     [d.Table("tCreatedTable")]
-    public class CreatedTable : DTOBase
+    public partial class CreatedTable : DTOBase
     {
         public CreatedTable(int id, string name, Guid guid, DateTime date, int index, bool active, decimal? price, string description, int? fkID, DateTime commonDate, int commonFkID)
         {
