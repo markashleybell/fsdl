@@ -59,6 +59,7 @@ module internal SqlGenerator =
     let constraintStatement tableName constraintSpecification = 
         let primaryKeyDefinition = sprintf "ALTER TABLE [%s] WITH CHECK ADD CONSTRAINT PK_%s%sPRIMARY KEY (%s)" 
         let foreignKeyDefinition = sprintf "ALTER TABLE [%s] WITH CHECK ADD CONSTRAINT FK_%s_%s_%s_%s%sFOREIGN KEY ([%s]) REFERENCES [%s] ([%s])" 
+        
         match constraintSpecification with 
         | PrimaryKey columnList -> (primaryKeyDefinition tableName tableName br (buildColumnList "[%s]" ", " columnList))
         | ForeignKey (columnName', fkTable, fkColumn) -> (foreignKeyDefinition tableName tableName columnName' fkTable fkColumn br columnName' fkTable fkColumn)
@@ -66,6 +67,7 @@ module internal SqlGenerator =
     // List of constraint statements for a table
     let constraintStatements commonConstraints table =
         let comment = sprintf "-- Create %s constraints" table.tableName
+        
         let constraintList = commonConstraints
                              |> List.append table.constraintSpecifications
                              |> List.map (constraintStatement table.tableName)
@@ -80,13 +82,16 @@ module internal SqlGenerator =
                                     | NonClusteredUnique cols -> (" UNIQUE", cols)
                                     | Clustered cols -> (" CLUSTERED", cols)
                                     | ClusteredUnique cols -> (" UNIQUE CLUSTERED", cols)
+
         sprintf "CREATE%s INDEX IX_%s_%s ON [%s] (%s)" 
             indexType tableName (buildColumnList "%s" "_" columnList) tableName (buildColumnList "[%s]" ", " columnList)
 
     let indexStatements table = 
         let comment = sprintf "-- Create %s indexes" table.tableName
+
         let indexList = table.indexSpecifications
                         |> List.map (indexStatement table.tableName)
+
         match indexList with
         | [] -> ""
         | indexes -> sprintf "%s%s" (comment::indexes |> String.concat br) br
