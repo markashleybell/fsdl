@@ -45,7 +45,18 @@ namespace test.com.DTO
     [d.Table("tCreatedTable")]
     public partial class CreatedTable : DTOBase
     {
-        public CreatedTable(int id, string name, Guid guid, DateTime date, int index, bool active, decimal? price, string description, int? fkID, DateTime commonDate, int commonFkID)
+        public CreatedTable(
+            int id,
+            string name,
+            Guid guid,
+            DateTime date,
+            int index,
+            bool active,
+            decimal? price,
+            string description,
+            int? fkID,
+            DateTime commonDate,
+            int commonFkID)
         {
             ID = id;
             Name = name;
@@ -62,14 +73,22 @@ namespace test.com.DTO
 
         [d.Key]
         public int ID { get; }
+
         [StringLength(16)]
         public string Name { get; }
+
         public Guid GUID { get; }
+
         public DateTime Date { get; }
+
         public int Index { get; }
+
         public bool Active { get; }
+
         public decimal? Price { get; }
+
         public string Description { get; }
+
         public int? FKID { get; }
     }
 }

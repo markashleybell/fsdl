@@ -75,7 +75,7 @@ module internal CSharpGenerator =
         columns
         |> List.append table.columnSpecifications
         |> List.map (propertyDefinition table.setters table.addDapperAttributes (isPrimaryKey table.constraintSpecifications))
-        |> String.concat br
+        |> String.concat brbr
         |> (fun s -> sprintf "%s" s)
 
     let namespaces table =
@@ -117,7 +117,7 @@ module internal CSharpGenerator =
                              | TEXT -> ("string")
                              | GUID -> ("Guid" |> nullableDataType isNullable)
                       
-        sprintf "%s %s" cSharpDataType (niceCamelName propertyName)
+        sprintf "%s %s" (indent3 cSharpDataType) (niceCamelName propertyName)
 
     let assignment column = 
         let propertyName = 
@@ -136,14 +136,15 @@ module internal CSharpGenerator =
         let c = columns
                 |> List.append table.columnSpecifications
                 |> List.map constructorParam
-                |> String.concat ", "
+                |> String.concat (sprintf ",%s" br)
         
         let a = columns
                 |> List.append table.columnSpecifications
                 |> List.map assignment
                 |> String.concat br
 
-        sprintf "%s %s(%s)%s%s%s%s%s%s%s" (indent2 "public") table.dtoClassName c br (indent2 "{") br a br (indent2 "}") br
+        sprintf "%s %s(%s%s)%s%s%s%s%s%s%s" 
+            (indent2 "public") table.dtoClassName br c br (indent2 "{") br a br (indent2 "}") br
 
     let classDefinition commonColumns table = 
         let classattr dap arr = 
