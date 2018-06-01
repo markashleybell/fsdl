@@ -1,7 +1,5 @@
 ﻿namespace fsdl
 
-open System
-
 module fsdl = 
     let generateTableDefinitions = SqlGenerator.generateTableDefinitions
     let generateConstraintDefinitions = SqlGenerator.generateConstraintDefinitions
