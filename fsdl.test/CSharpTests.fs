@@ -114,3 +114,32 @@ type ``Basic C# output tests`` () =
         code |> Console.WriteLine |> ignore
         name |> should equal TestCSharpData.testTable.dtoClassName
         code |> should equal TestCSharpData.expectedClassDefinitions
+
+    [<Test>]
+    member test.``Check unnecessary using statements are not emitted`` () =
+        let tbl = {
+            sqlStatementType = CREATE
+            tableName = "tCreatedTable"
+            dtoClassName = "CreatedTable"
+            dtoNamespace = "test.com.DTO"
+            dtoBaseClassName = Some "DTOBase"
+            columnSpecifications = [Identity("ID", INT, 1, 1)
+                                    Null("Price", MONEY)] 
+            constraintSpecifications = [PrimaryKey(["ID"])]
+            indexSpecifications = []
+            addDapperAttributes = false
+            partial = true
+            generateConstructor = true
+            baseConstructorParameters = true
+            setters = NoSetter
+        }
+
+        let list = fsdl.generateDTOClassDefinitionList 
+                        [tbl] []
+
+        let (_, code) = list.Head
+
+        code |> Console.WriteLine |> ignore
+        code |> should not' (contain (sprintf "using System;"))
+        code |> should not' (contain (sprintf "using System.ComponentModel.DataAnnotations;"))
+        code |> should not' (contain (sprintf "using d = Dapper.Contrib.Extensions;"))

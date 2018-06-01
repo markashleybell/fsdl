@@ -79,23 +79,45 @@ module internal CSharpGenerator =
         |> (fun s -> sprintf "%s" s)
 
     let namespaces table =
-        let usings = [
-            "using System;"
-            "using System.ComponentModel.DataAnnotations;"
-        ]
+        let usings = []
 
-        let allusings = match table.addDapperAttributes with
+        let getDataType col =
+            match col with
+            | Null (_, dataType) -> dataType
+            | NotNull (_, dataType, _) -> dataType
+            | Identity (_, dataType, _, _) -> dataType
+
+        let isNonPrimitiveType t =
+            match t with
+            | DATE -> true
+            | GUID -> true
+            | _ -> false
+
+        let isCharType t =
+            match t with
+            | CHR _ -> true
+            | _ -> false
+
+        let tableDataTypes = 
+            table.columnSpecifications |> List.map getDataType
+
+        let usings = if (tableDataTypes |> List.exists isNonPrimitiveType) then usings @ ["using System;"] else usings
+
+        let usings = if (tableDataTypes |> List.exists isCharType) then usings @ ["using System.ComponentModel.DataAnnotations;"] else usings
+
+        let usings = match table.addDapperAttributes with
                         | false -> usings
                         | true -> usings @ ["using d = Dapper.Contrib.Extensions;"]
+
         let code = [
-            allusings |> String.concat br
-            ""
             sprintf "namespace %s" table.dtoNamespace
             "{"
             "%s"
             "}"
             ""
         ] 
+
+        let code = if usings.Length > 0 then ((usings @ [""]) |> String.concat br) :: code else code
 
         let tmp = code |> String.concat br
 
