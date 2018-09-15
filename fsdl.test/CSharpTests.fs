@@ -66,9 +66,9 @@ namespace test.com.DTO
             bool active,
             decimal? price,
             string description,
-            int? fkID,
+            int? fkId,
             DateTime commonDate,
-            int commonFkID)
+            int commonFkId)
         {
             ID = id;
             Name = name;
@@ -78,9 +78,9 @@ namespace test.com.DTO
             Active = active;
             Price = price;
             Description = description;
-            FKID = fkID;
+            FKID = fkId;
             CommonDate = commonDate;
-            CommonFKID = commonFkID;
+            CommonFKID = commonFkId;
         }
 
         [d.Key]

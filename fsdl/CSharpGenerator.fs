@@ -50,7 +50,7 @@ module CSharpGenerator =
         let n = niceCamelName s
         let idSuffix = n <> "id" && n |> isMatchCi "(?<!GU)ID$"
         match idSuffix with
-        | true -> (replaceCi @"ID$" "ID" n)
+        | true -> (replaceCi @"ID$" "Id" n)
         | false -> n
 
     let attributes isPrimaryKey isExplicitKey addDapperAttributes attributeList  =
