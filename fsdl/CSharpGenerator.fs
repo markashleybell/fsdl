@@ -2,15 +2,28 @@
 
 open System
 open FSharp.Data.Runtime.NameUtils
+open System.Text.RegularExpressions
 
-module internal CSharpGenerator = 
+module CSharpGenerator = 
     let indent = sprintf "    %s"
     let indent2 = indent >> indent 
     let indent3 = indent >> indent2
-    let br = Environment.NewLine // Shorthand for newline
+    let br = Environment.NewLine
     let brbr = br + br
-    let scbr = sprintf ";%s" br // Shorthand for semicolon followed by newline
+    let scbr = sprintf ";%s" br
     
+    let isMatch rx opts input =
+        Regex.IsMatch (input, rx, opts)
+
+    let isMatchCi rx input =
+        isMatch rx RegexOptions.IgnoreCase input
+
+    let replace rx (rep: string) opts input =
+        Regex.Replace (input, rx, rep, opts)
+
+    let replaceCi rx rep input =
+        replace rx rep RegexOptions.IgnoreCase input
+
     let addNewLineIfNotEmpty s =
         match s with
         | "" -> ""
@@ -33,6 +46,13 @@ module internal CSharpGenerator =
         | CHR _ -> true
         | _ -> false
 
+    let camelName s = 
+        let n = niceCamelName s
+        let idSuffix = n <> "id" && n |> isMatchCi "(?<!GU)ID$"
+        match idSuffix with
+        | true -> (replaceCi @"ID$" "ID" n)
+        | false -> n
+
     let attributes isPrimaryKey isExplicitKey addDapperAttributes attributeList  =
         let keyAttribute = 
             match addDapperAttributes with
@@ -41,7 +61,8 @@ module internal CSharpGenerator =
                       | true -> "[d.ExplicitKey]"
                       | false -> "[d.Key]"
 
-        let attributeStrings = attributeList |> List.map (fun a -> sprintf "%s" (indent2 a))
+        let attributeStrings = 
+            attributeList |> List.map (fun a -> sprintf "%s" (indent2 a))
 
         let attributeStrings' = 
             match isPrimaryKey with
@@ -114,7 +135,7 @@ module internal CSharpGenerator =
         let tableDataTypes = table.columnSpecifications |> List.map getDataType
 
         let classUsesNonPrimitiveSystemTypes = tableDataTypes |> List.exists isNonPrimitiveType
-        let classUsesCharTypes = tableDataTypes |> List.exists isNonPrimitiveType
+        let classUsesCharTypes = tableDataTypes |> List.exists isCharType
 
         let usings = 
             match classUsesNonPrimitiveSystemTypes with
@@ -163,7 +184,7 @@ module internal CSharpGenerator =
             | TEXT -> ("string")
             | GUID -> ("Guid" |> nullableDataType isNullable)
                       
-        sprintf "%s %s" (indent3 cSharpDataType) (niceCamelName propertyName)
+        sprintf "%s %s" (indent3 cSharpDataType) (camelName propertyName)
 
     let assignment column = 
         let propertyName = 
@@ -172,7 +193,7 @@ module internal CSharpGenerator =
             | NotNull (columnName, _, _) -> columnName
             | Identity (columnName, _, _, _) -> columnName
 
-        sprintf "%s = %s;" (indent3 propertyName) (niceCamelName propertyName)
+        sprintf "%s = %s;" (indent3 propertyName) (camelName propertyName)
 
     let constructorDefinition commonColumns table = 
         let columns = 

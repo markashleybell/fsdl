@@ -1,6 +1,9 @@
 <Query Kind="FSharpProgram">
   <Reference Relative="..\fsdl\bin\Debug\net462\fsdl.dll">C:\Src\fsdl\fsdl\bin\Debug\net462\fsdl.dll</Reference>
+  <NuGetReference>FSharp.Data</NuGetReference>
   <Namespace>fsdl</Namespace>
+  <Namespace>FSharp.Data</Namespace>
+  <Namespace>FSharp.Data.Runtime</Namespace>
 </Query>
 
 let commonColumns = 

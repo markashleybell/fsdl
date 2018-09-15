@@ -14,6 +14,7 @@
         <Compile Include="CSharpGenerator.fs" />
         <Compile Include="SqlGenerator.fs" />
         <Compile Include="FSDL.fs" />
+        <None Include="Script.fsx" />
     </ItemGroup>
 
     <ItemGroup>

@@ -2,7 +2,7 @@
 
 open System
 
-module internal SqlGenerator = 
+module SqlGenerator = 
     let indent = sprintf "    %s" 
     let indent2 = indent >> indent 
     let br = Environment.NewLine // Shorthand for newline
