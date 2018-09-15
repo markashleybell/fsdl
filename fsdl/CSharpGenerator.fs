@@ -98,6 +98,7 @@ module CSharpGenerator =
             | CHR l -> ([sprintf "[StringLength(%i)]" l], "string")
             | TEXT -> ([], "string")
             | GUID -> ([], "Guid" |> nullableDataType isNullable)
+            | ENUM t -> ([], t.Name |> nullableDataType isNullable)
 
         let setter = 
             match setters with
@@ -138,6 +139,12 @@ module CSharpGenerator =
         let classUsesNonPrimitiveSystemTypes = tableDataTypes |> List.exists isNonPrimitiveType
         let classUsesCharTypes = tableDataTypes |> List.exists isCharType
 
+        let enumTypeNameSpaces = 
+            tableDataTypes
+            |> List.choose (fun dt -> match dt with | ENUM t -> Some t.Namespace | _ -> None)
+            |> List.choose (fun ns -> match (ns <> table.dtoNamespace) with | true -> Some ns | false -> None)
+            |> List.map (fun ns -> sprintf "using %s;" ns)
+
         let usings = 
             match classUsesNonPrimitiveSystemTypes with
             | true -> usings @ ["using System;"] 
@@ -152,6 +159,8 @@ module CSharpGenerator =
             match table.addDapperAttributes with
             | true -> usings @ ["using d = Dapper.Contrib.Extensions;"]
             | false -> usings
+        
+        let usings = usings @ enumTypeNameSpaces
 
         let code = [
             sprintf "namespace %s" table.dtoNamespace
@@ -184,6 +193,7 @@ module CSharpGenerator =
             | CHR _ -> ("string")
             | TEXT -> ("string")
             | GUID -> ("Guid" |> nullableDataType isNullable)
+            | ENUM t -> (t.Name |> nullableDataType isNullable)
                       
         sprintf "%s %s" (indent3 cSharpDataType) (camelName propertyName)
 

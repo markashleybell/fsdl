@@ -1,7 +1,9 @@
 <Query Kind="FSharpProgram">
   <Reference Relative="..\fsdl\bin\Debug\net462\fsdl.dll">C:\Src\fsdl\fsdl\bin\Debug\net462\fsdl.dll</Reference>
+  <Reference Relative="..\fsdl.test\bin\Debug\net462\fsdl.test.dll">C:\Src\fsdl\fsdl.test\bin\Debug\net462\fsdl.test.dll</Reference>
   <NuGetReference>FSharp.Data</NuGetReference>
   <Namespace>fsdl.CodeGeneration</Namespace>
+  <Namespace>fsdl.test</Namespace>
   <Namespace>fsdl.Types</Namespace>
   <Namespace>FSharp.Data</Namespace>
   <Namespace>FSharp.Data.Runtime</Namespace>
@@ -34,6 +36,7 @@ let testTable = {
             Null("TotalPrice", MONEY)
             Null("Description", TEXT)
             NotNull("FKID", INT, NONE)
+            NotNull("EnumProp", ENUM(typeof<TestEnum>), VAL(int TestEnum.A))
         ] 
     constraintSpecifications = 
         [

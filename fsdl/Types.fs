@@ -1,9 +1,11 @@
 ﻿namespace fsdl
 
-module Types = 
+open System
+
+module Types =
     type StatementType = ALTER | CREATE
 
-    type DataType = INT | BIT | DATE | MONEY | TEXT | GUID | CHR of int
+    type DataType = INT | BIT | DATE | MONEY | TEXT | GUID | CHR of int | ENUM of Type
 
     type Default = NONE | NULL | TRUE | FALSE | NOW | NEWGUID | VAL of int
 

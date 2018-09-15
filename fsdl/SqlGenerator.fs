@@ -19,6 +19,7 @@ module SqlGenerator =
         | CHR l -> sprintf "NVARCHAR(%i)" l
         | TEXT -> "NVARCHAR(MAX)"
         | GUID -> "UNIQUEIDENTIFIER"
+        | ENUM _ -> "INT"
     
     let column columnName dataType = 
         sprintf "%s %s" (indent (sprintf "[%s]" columnName)) (columnDataType dataType)

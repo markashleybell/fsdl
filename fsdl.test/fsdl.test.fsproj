@@ -5,6 +5,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <Compile Include="TestEnum.fs" />
         <Compile Include="CSharpTests.fs" />
         <Compile Include="SqlTests.fs" />
         <None Include="App.config" />
