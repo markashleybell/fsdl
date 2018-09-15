@@ -6,10 +6,16 @@ open System
 open fsdl
 
 module TestCSharpData = 
-    let commonColumns = [NotNull("CommonDate", DATE, NOW)
-                         NotNull("CommonFKID", INT, VAL(1))]
+    let commonColumns = 
+        [
+            NotNull("CommonDate", DATE, NOW)
+            NotNull("CommonFKID", INT, VAL(1))
+        ]
     
-    let commonConstraints = [ForeignKey("CommonFKID", "tCommonFKTable", "ID")]
+    let commonConstraints = 
+        [
+            ForeignKey("CommonFKID", "tCommonFKTable", "ID")
+        ]
 
     let testTable = {
         sqlStatementType = CREATE
@@ -17,17 +23,23 @@ module TestCSharpData =
         dtoClassName = "CreatedTable"
         dtoNamespace = "test.com.DTO"
         dtoBaseClassName = Some "DTOBase"
-        columnSpecifications = [Identity("ID", INT, 1, 1)
-                                Null("Name", CHR(16))
-                                NotNull("GUID", GUID, NEWGUID)
-                                NotNull("Date", DATE, NOW)
-                                NotNull("Index", INT, VAL(100))
-                                NotNull("Active", BIT, FALSE)
-                                Null("Price", MONEY)
-                                Null("Description", TEXT)
-                                Null("FKID", INT)] 
-        constraintSpecifications = [PrimaryKey(["ID"])
-                                    ForeignKey("FKID", "tFKTable", "ID")]
+        columnSpecifications = 
+            [
+                Identity("ID", INT, 1, 1)
+                Null("Name", CHR(16))
+                NotNull("GUID", GUID, NEWGUID)
+                NotNull("Date", DATE, NOW)
+                NotNull("Index", INT, VAL(100))
+                NotNull("Active", BIT, FALSE)
+                Null("Price", MONEY)
+                Null("Description", TEXT)
+                Null("FKID", INT)
+            ] 
+        constraintSpecifications = 
+            [
+                PrimaryKey(["ID"])
+                ForeignKey("FKID", "tFKTable", "ID")
+            ]
         indexSpecifications = []
         addDapperAttributes = true
         partial = true
@@ -54,9 +66,9 @@ namespace test.com.DTO
             bool active,
             decimal? price,
             string description,
-            int? fkID,
+            int? fkid,
             DateTime commonDate,
-            int commonFkID)
+            int commonFkid)
         {
             ID = id;
             Name = name;
@@ -66,9 +78,9 @@ namespace test.com.DTO
             Active = active;
             Price = price;
             Description = description;
-            FKID = fkID;
+            FKID = fkid;
             CommonDate = commonDate;
-            CommonFKID = commonFkID;
+            CommonFKID = commonFkid;
         }
 
         [d.Key]
@@ -123,9 +135,15 @@ type ``Basic C# output tests`` () =
             dtoClassName = "CreatedTable"
             dtoNamespace = "test.com.DTO"
             dtoBaseClassName = Some "DTOBase"
-            columnSpecifications = [Identity("ID", INT, 1, 1)
-                                    Null("Price", MONEY)] 
-            constraintSpecifications = [PrimaryKey(["ID"])]
+            columnSpecifications = 
+                [
+                    Identity("ID", INT, 1, 1)
+                    Null("Price", MONEY)
+                ] 
+            constraintSpecifications = 
+                [
+                    PrimaryKey(["ID"])
+                ]
             indexSpecifications = []
             addDapperAttributes = false
             partial = true
@@ -134,8 +152,7 @@ type ``Basic C# output tests`` () =
             setters = NoSetter
         }
 
-        let list = fsdl.generateDTOClassDefinitionList 
-                        [tbl] []
+        let list = fsdl.generateDTOClassDefinitionList [tbl] []
 
         let (_, code) = list.Head
 

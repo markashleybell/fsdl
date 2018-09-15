@@ -1,14 +1,18 @@
 <Query Kind="FSharpProgram">
-  <Reference Relative="..\fsdl\bin\Debug\fsdl.dll">C:\Src\fsdl\fsdl\bin\Debug\fsdl.dll</Reference>
+  <Reference Relative="..\fsdl\bin\Debug\net462\fsdl.dll">C:\Src\fsdl\fsdl\bin\Debug\net462\fsdl.dll</Reference>
   <Namespace>fsdl</Namespace>
 </Query>
 
-let commonColumns = [NotNull("CommonDate", DATE, NOW)
-                     NotNull("CommonFKID", INT, VAL(1))]
+let commonColumns = 
+    [
+        NotNull("CommonDate", DATE, NOW)
+        NotNull("CommonFKID", INT, VAL(1))
+    ]
     
-let commonConstraints = [
-    ForeignKey("CommonFKID", "tCommonFKTable", "ID")
-]
+let commonConstraints = 
+    [
+        ForeignKey("CommonFKID", "tCommonFKTable", "ID")
+    ]
 
 let testTable = {
     sqlStatementType = CREATE

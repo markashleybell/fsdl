@@ -6,10 +6,16 @@ open System
 open fsdl
 
 module TestSqlData = 
-    let commonColumns = [NotNull("CommonDate", DATE, NOW)
-                         NotNull("CommonFKID", INT, VAL(1))]
+    let commonColumns = 
+        [
+            NotNull("CommonDate", DATE, NOW)
+            NotNull("CommonFKID", INT, VAL(1))
+        ]
     
-    let commonConstraints = [ForeignKey("CommonFKID", "tCommonFKTable", "ID")]
+    let commonConstraints = 
+        [
+            ForeignKey("CommonFKID", "tCommonFKTable", "ID")
+        ]
 
     let testTable = {
         sqlStatementType = CREATE
@@ -17,18 +23,27 @@ module TestSqlData =
         dtoClassName = "CreatedTable"
         dtoNamespace = "test.com.DTO"
         dtoBaseClassName = Some "DTOBase"
-        columnSpecifications = [Identity("ID", INT, 1, 1)
-                                Null("Name", CHR(16))
-                                NotNull("GUID", GUID, NEWGUID)
-                                NotNull("Date", DATE, NOW)
-                                NotNull("Index", INT, VAL(100))
-                                NotNull("Active", BIT, FALSE)
-                                Null("Price", MONEY)
-                                Null("Description", TEXT)
-                                Null("FKID", INT)] 
-        constraintSpecifications = [PrimaryKey(["ID"])
-                                    ForeignKey("FKID", "tFKTable", "ID")]
-        indexSpecifications = [ClusteredUnique(["ID"])]
+        columnSpecifications = 
+            [
+                Identity("ID", INT, 1, 1)
+                Null("Name", CHR(16))
+                NotNull("GUID", GUID, NEWGUID)
+                NotNull("Date", DATE, NOW)
+                NotNull("Index", INT, VAL(100))
+                NotNull("Active", BIT, FALSE)
+                Null("Price", MONEY)
+                Null("Description", TEXT)
+                Null("FKID", INT)
+            ] 
+        constraintSpecifications = 
+            [
+                PrimaryKey(["ID"])
+                ForeignKey("FKID", "tFKTable", "ID")
+            ]
+        indexSpecifications = 
+            [
+                ClusteredUnique(["ID"])
+            ]
         addDapperAttributes = true
         partial = true
         generateConstructor = true

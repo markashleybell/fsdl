@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27004.2006
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "fsdl", "fsdl\fsdl.fsproj", "{C36289D3-E689-4C5E-B7D7-CDFD7D27B0D0}"
-EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "fsdl.test", "fsdl.test\fsdl.test.fsproj", "{C12355CB-D087-4B57-851C-824B1DF0061B}"
+EndProject
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "fsdl", "fsdl\fsdl.fsproj", "{0E95728A-D8DD-4EC1-8CF9-F2EBBDE8E001}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -13,14 +13,14 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{C36289D3-E689-4C5E-B7D7-CDFD7D27B0D0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C36289D3-E689-4C5E-B7D7-CDFD7D27B0D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C36289D3-E689-4C5E-B7D7-CDFD7D27B0D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C36289D3-E689-4C5E-B7D7-CDFD7D27B0D0}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C12355CB-D087-4B57-851C-824B1DF0061B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C12355CB-D087-4B57-851C-824B1DF0061B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C12355CB-D087-4B57-851C-824B1DF0061B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C12355CB-D087-4B57-851C-824B1DF0061B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0E95728A-D8DD-4EC1-8CF9-F2EBBDE8E001}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0E95728A-D8DD-4EC1-8CF9-F2EBBDE8E001}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0E95728A-D8DD-4EC1-8CF9-F2EBBDE8E001}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0E95728A-D8DD-4EC1-8CF9-F2EBBDE8E001}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

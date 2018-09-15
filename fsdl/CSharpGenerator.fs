@@ -1,7 +1,7 @@
 ﻿namespace fsdl
 
 open System
-open Utils
+open FSharp.Data.Runtime.NameUtils
 
 module internal CSharpGenerator = 
     let indent = sprintf "    %s"
