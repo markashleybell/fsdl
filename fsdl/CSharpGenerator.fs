@@ -11,23 +11,46 @@ module internal CSharpGenerator =
     let brbr = br + br
     let scbr = sprintf ";%s" br // Shorthand for semicolon followed by newline
     
+    let addNewLineIfNotEmpty s =
+        match s with
+        | "" -> ""
+        | _ -> s + br
+
+    let getDataType col =
+        match col with
+        | Null (_, dataType) -> dataType
+        | NotNull (_, dataType, _) -> dataType
+        | Identity (_, dataType, _, _) -> dataType
+
+    let isNonPrimitiveType t =
+        match t with
+        | DATE -> true
+        | GUID -> true
+        | _ -> false
+
+    let isCharType t =
+        match t with
+        | CHR _ -> true
+        | _ -> false
+
     let attributes isPrimaryKey isExplicitKey addDapperAttributes attributeList  =
-        let keyAttribute = match addDapperAttributes with
-                           | false -> "[Key]"
-                           | true -> match isExplicitKey with 
-                                     | false -> "[d.Key]"
-                                     | true -> "[d.ExplicitKey]"
+        let keyAttribute = 
+            match addDapperAttributes with
+            | false -> "[Key]"
+            | true -> match isExplicitKey with 
+                      | true -> "[d.ExplicitKey]"
+                      | false -> "[d.Key]"
 
-        let attributeStrings = attributeList 
-                               |> List.map (fun a -> sprintf "%s" (indent2 a))
+        let attributeStrings = attributeList |> List.map (fun a -> sprintf "%s" (indent2 a))
 
-        let attributeStrings' = match isPrimaryKey with
-                                | false -> attributeStrings
-                                | true -> (indent2 keyAttribute)::attributeStrings
+        let attributeStrings' = 
+            match isPrimaryKey with
+            | true -> (indent2 keyAttribute)::attributeStrings
+            | false -> attributeStrings
 
-        attributeStrings' |> String.concat br |> (fun s -> match s with
-                                                           | "" -> ""
-                                                           | _ -> s + br)
+        attributeStrings' 
+        |> String.concat br 
+        |> addNewLineIfNotEmpty
     
     let nullableDataType isNullable propertyName =
         match isNullable with
@@ -37,22 +60,28 @@ module internal CSharpGenerator =
     let propertyDefinition setters addDapperAttributes isPrimaryKey column = 
         let (propertyName, isPrimaryKey', isExplicitKey, isNullable, isNonKeyIdentity, dataType) = 
             match column with
-            | Null (columnName, dataType) -> (columnName, false, false, true, false, dataType)
-            | NotNull (columnName, dataType, d) -> (columnName, (isPrimaryKey columnName), true, false, false, dataType)
-            | Identity (columnName, dataType, initialValue, increment) -> (columnName, (isPrimaryKey columnName), false, false, (not (isPrimaryKey columnName)), dataType)
+            | Null (columnName, dataType) -> 
+                (columnName, false, false, true, false, dataType)
+            | NotNull (columnName, dataType, _) -> 
+                (columnName, (isPrimaryKey columnName), true, false, false, dataType)
+            | Identity (columnName, dataType, _, _) -> 
+                (columnName, (isPrimaryKey columnName), false, false, (not (isPrimaryKey columnName)), dataType)
                                    
-        let (validationAttributes, cSharpDataType) = match dataType with
-                                                     | INT -> ((if addDapperAttributes && isNonKeyIdentity then ["[d.Computed]"] else []), "int" |> nullableDataType isNullable)
-                                                     | BIT -> ([], "bool" |> nullableDataType isNullable)
-                                                     | MONEY -> ([], "decimal" |> nullableDataType isNullable)
-                                                     | DATE -> ([], "DateTime" |> nullableDataType isNullable)
-                                                     | CHR l -> ([sprintf "[StringLength(%i)]" l], "string")
-                                                     | TEXT -> ([], "string")
-                                                     | GUID -> ([], "Guid" |> nullableDataType isNullable)
-        let setter = match setters with
-                     | NoSetter -> ""
-                     | PublicSetter -> "set; "
-                     | PrivateSetter -> "private set; "
+        let (validationAttributes, cSharpDataType) = 
+            match dataType with
+            | INT -> ((if addDapperAttributes && isNonKeyIdentity then ["[d.Computed]"] else []), "int" |> nullableDataType isNullable)
+            | BIT -> ([], "bool" |> nullableDataType isNullable)
+            | MONEY -> ([], "decimal" |> nullableDataType isNullable)
+            | DATE -> ([], "DateTime" |> nullableDataType isNullable)
+            | CHR l -> ([sprintf "[StringLength(%i)]" l], "string")
+            | TEXT -> ([], "string")
+            | GUID -> ([], "Guid" |> nullableDataType isNullable)
+
+        let setter = 
+            match setters with
+            | NoSetter -> ""
+            | PublicSetter -> "set; "
+            | PrivateSetter -> "private set; "
 
         sprintf "%s%s %s %s { get; %s}" 
             (attributes isPrimaryKey' isExplicitKey addDapperAttributes validationAttributes) (indent2 "public") cSharpDataType propertyName setter
@@ -68,9 +97,10 @@ module internal CSharpGenerator =
     let properties commonColumns table = 
         // If a base class is being used, don't add the
         // common columns to the generated DTO classes
-        let columns = match table.dtoBaseClassName with
-                      | Some s -> []
-                      | None -> commonColumns
+        let columns = 
+            match table.dtoBaseClassName with
+            | Some s -> []
+            | None -> commonColumns
 
         columns
         |> List.append table.columnSpecifications
@@ -81,33 +111,25 @@ module internal CSharpGenerator =
     let namespaces table =
         let usings = []
 
-        let getDataType col =
-            match col with
-            | Null (_, dataType) -> dataType
-            | NotNull (_, dataType, _) -> dataType
-            | Identity (_, dataType, _, _) -> dataType
+        let tableDataTypes = table.columnSpecifications |> List.map getDataType
 
-        let isNonPrimitiveType t =
-            match t with
-            | DATE -> true
-            | GUID -> true
-            | _ -> false
+        let classUsesNonPrimitiveSystemTypes = tableDataTypes |> List.exists isNonPrimitiveType
+        let classUsesCharTypes = tableDataTypes |> List.exists isNonPrimitiveType
 
-        let isCharType t =
-            match t with
-            | CHR _ -> true
-            | _ -> false
+        let usings = 
+            match classUsesNonPrimitiveSystemTypes with
+            | true -> usings @ ["using System;"] 
+            | false -> usings
 
-        let tableDataTypes = 
-            table.columnSpecifications |> List.map getDataType
+        let usings = 
+            match classUsesCharTypes with
+            | true -> usings @ ["using System.ComponentModel.DataAnnotations;"] 
+            | false -> usings
 
-        let usings = if (tableDataTypes |> List.exists isNonPrimitiveType) then usings @ ["using System;"] else usings
-
-        let usings = if (tableDataTypes |> List.exists isCharType) then usings @ ["using System.ComponentModel.DataAnnotations;"] else usings
-
-        let usings = match table.addDapperAttributes with
-                        | false -> usings
-                        | true -> usings @ ["using d = Dapper.Contrib.Extensions;"]
+        let usings = 
+            match table.addDapperAttributes with
+            | true -> usings @ ["using d = Dapper.Contrib.Extensions;"]
+            | false -> usings
 
         let code = [
             sprintf "namespace %s" table.dtoNamespace
@@ -117,11 +139,12 @@ module internal CSharpGenerator =
             ""
         ] 
 
-        let code = if usings.Length > 0 then ((usings @ [""]) |> String.concat br) :: code else code
+        let code = 
+            match (usings.Length > 0) with
+            | true -> ((usings @ [""]) |> String.concat br) :: code 
+            | false -> code
 
-        let tmp = code |> String.concat br
-
-        Printf.StringFormat<string->string>(tmp)
+        Printf.StringFormat<string->string>((code |> String.concat br))
 
     let constructorParam column = 
         let (propertyName, isNullable, dataType) = 
@@ -130,14 +153,15 @@ module internal CSharpGenerator =
             | NotNull (columnName, dataType, _) -> (columnName, false, dataType)
             | Identity (columnName, dataType, _, _) -> (columnName, false, dataType)
                                    
-        let cSharpDataType = match dataType with
-                             | INT -> ("int" |> nullableDataType isNullable)
-                             | BIT -> ("bool" |> nullableDataType isNullable)
-                             | MONEY -> ("decimal" |> nullableDataType isNullable)
-                             | DATE -> ("DateTime" |> nullableDataType isNullable)
-                             | CHR _ -> ("string")
-                             | TEXT -> ("string")
-                             | GUID -> ("Guid" |> nullableDataType isNullable)
+        let cSharpDataType = 
+            match dataType with
+            | INT -> ("int" |> nullableDataType isNullable)
+            | BIT -> ("bool" |> nullableDataType isNullable)
+            | MONEY -> ("decimal" |> nullableDataType isNullable)
+            | DATE -> ("DateTime" |> nullableDataType isNullable)
+            | CHR _ -> ("string")
+            | TEXT -> ("string")
+            | GUID -> ("Guid" |> nullableDataType isNullable)
                       
         sprintf "%s %s" (indent3 cSharpDataType) (niceCamelName propertyName)
 
@@ -151,19 +175,22 @@ module internal CSharpGenerator =
         sprintf "%s = %s;" (indent3 propertyName) (niceCamelName propertyName)
 
     let constructorDefinition commonColumns table = 
-        let columns = match table.baseConstructorParameters with
-                      | false -> []
-                      | true -> commonColumns
+        let columns = 
+            match table.baseConstructorParameters with
+            | true -> commonColumns
+            | false -> []
 
-        let c = columns
-                |> List.append table.columnSpecifications
-                |> List.map constructorParam
-                |> String.concat (sprintf ",%s" br)
+        let c = 
+            columns
+            |> List.append table.columnSpecifications
+            |> List.map constructorParam
+            |> String.concat (sprintf ",%s" br)
         
-        let a = columns
-                |> List.append table.columnSpecifications
-                |> List.map assignment
-                |> String.concat br
+        let a = 
+            columns
+            |> List.append table.columnSpecifications
+            |> List.map assignment
+            |> String.concat br
 
         sprintf "%s %s(%s%s)%s%s%s%s%s%s%s" 
             (indent2 "public") table.dtoClassName br c br (indent2 "{") br a br (indent2 "}") br
@@ -171,26 +198,30 @@ module internal CSharpGenerator =
     let classDefinition commonColumns table = 
         let classattr dap arr = 
             match dap with
-                  | false -> arr
-                  | true -> (indent (sprintf "[d.Table(\"%s\")]" table.tableName))::arr
+            | true -> (indent (sprintf "[d.Table(\"%s\")]" table.tableName))::arr
+            | false -> arr
 
-        let basecls = match table.dtoBaseClassName with
-                      | Some s -> sprintf " : %s" s
-                      | None -> ""
+        let basecls = 
+            match table.dtoBaseClassName with
+            | Some s -> sprintf " : %s" s
+            | None -> ""
 
-        let constructor = match table.generateConstructor with
-                          | false -> ""
-                          | true -> sprintf "%s%s" br (constructorDefinition commonColumns table)
+        let constructor = 
+            match table.generateConstructor with
+            | true -> sprintf "%s%s" br (constructorDefinition commonColumns table)
+            | false -> ""
 
-        let partial = match table.partial with
-                      | false -> ""
-                      | true -> " partial"
+        let partial =
+            match table.partial with
+            | true -> " partial"
+            | false -> ""
 
         let cls = indent (sprintf "public%s class %s%s%s%s%s" partial table.dtoClassName basecls br (indent "{") constructor) 
 
-        let def = [cls; (properties commonColumns table); (indent "}")] 
-                  |> (classattr table.addDapperAttributes)
-                  |> String.concat br
+        let def = 
+            [cls; (properties commonColumns table); (indent "}")] 
+            |> (classattr table.addDapperAttributes)
+            |> String.concat br
 
         (table.dtoClassName, sprintf (namespaces table) def)
 
