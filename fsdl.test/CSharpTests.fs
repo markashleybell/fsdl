@@ -3,7 +3,8 @@
 open NUnit.Framework
 open FsUnit
 open System
-open fsdl
+open fsdl.Types
+open fsdl.CodeGeneration
 
 module TestCSharpData = 
     let commonColumns = 
@@ -110,7 +111,7 @@ namespace test.com.DTO
 type ``Basic C# output tests`` () =
     [<Test>] 
     member test.``Check DTO class output against reference`` () =
-        let code = fsdl.generateDTOClassDefinitions 
+        let code = generateDTOClassDefinitions 
                     [TestCSharpData.testTable] TestCSharpData.commonColumns
 
         code |> Console.WriteLine |> ignore
@@ -118,7 +119,7 @@ type ``Basic C# output tests`` () =
 
     [<Test>] 
     member test.``Check DTO class list output against reference`` () =
-        let list = fsdl.generateDTOClassDefinitionList 
+        let list = generateDTOClassDefinitionList 
                         [TestCSharpData.testTable] TestCSharpData.commonColumns
 
         let (name, code) = list.Head
@@ -152,7 +153,7 @@ type ``Basic C# output tests`` () =
             setters = NoSetter
         }
 
-        let list = fsdl.generateDTOClassDefinitionList [tbl] []
+        let list = generateDTOClassDefinitionList [tbl] []
 
         let (_, code) = list.Head
 

@@ -1,6 +1,7 @@
 ﻿namespace fsdl
 
 open System
+open Types
 
 module SqlGenerator = 
     let indent = sprintf "    %s" 

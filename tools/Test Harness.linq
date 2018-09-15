@@ -1,7 +1,8 @@
 <Query Kind="FSharpProgram">
   <Reference Relative="..\fsdl\bin\Debug\net462\fsdl.dll">C:\Src\fsdl\fsdl\bin\Debug\net462\fsdl.dll</Reference>
   <NuGetReference>FSharp.Data</NuGetReference>
-  <Namespace>fsdl</Namespace>
+  <Namespace>fsdl.CodeGeneration</Namespace>
+  <Namespace>fsdl.Types</Namespace>
   <Namespace>FSharp.Data</Namespace>
   <Namespace>FSharp.Data.Runtime</Namespace>
 </Query>
@@ -50,10 +51,10 @@ let testTable = {
     setters = PrivateSetter
 }
 
-fsdl.generateDTOClassDefinitions [testTable] commonColumns |> Dump |> ignore
+generateDTOClassDefinitions [testTable] commonColumns |> Dump |> ignore
 
-fsdl.generateTableDefinitions [testTable] commonColumns |> Dump |> ignore
+generateTableDefinitions [testTable] commonColumns |> Dump |> ignore
 
-fsdl.generateIndexDefinitions [testTable] |> Dump |> ignore
+generateIndexDefinitions [testTable] |> Dump |> ignore
 
-fsdl.generateConstraintDefinitions [testTable] commonConstraints |> Dump |> ignore
+generateConstraintDefinitions [testTable] commonConstraints |> Dump |> ignore

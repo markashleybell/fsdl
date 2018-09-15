@@ -5,9 +5,9 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <None Include="App.config" />
         <Compile Include="CSharpTests.fs" />
         <Compile Include="SqlTests.fs" />
+        <None Include="App.config" />
     </ItemGroup>
 
     <ItemGroup>

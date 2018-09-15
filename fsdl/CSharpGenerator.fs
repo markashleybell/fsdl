@@ -3,6 +3,7 @@
 open System
 open FSharp.Data.Runtime.NameUtils
 open System.Text.RegularExpressions
+open Types
 
 module CSharpGenerator = 
     let indent = sprintf "    %s"

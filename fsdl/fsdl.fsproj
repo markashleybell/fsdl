@@ -10,10 +10,10 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Compile Include="SqlTypes.fs" />
+        <Compile Include="Types.fs" />
         <Compile Include="CSharpGenerator.fs" />
         <Compile Include="SqlGenerator.fs" />
-        <Compile Include="FSDL.fs" />
+        <Compile Include="CodeGeneration.fs" />
         <None Include="Script.fsx" />
     </ItemGroup>
 

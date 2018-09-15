@@ -3,7 +3,8 @@
 open NUnit.Framework
 open FsUnit
 open System
-open fsdl
+open fsdl.Types
+open fsdl.CodeGeneration
 
 module TestSqlData = 
     let commonColumns = 
@@ -99,7 +100,7 @@ PRINT 'Indexes Created'
 type ``Basic SQL output tests`` () =
     [<Test>] 
     member test.``Check CREATE TABLE output against reference`` () =
-        let sql = fsdl.generateTableDefinitions 
+        let sql = generateTableDefinitions 
                     [TestSqlData.testTable] TestSqlData.commonColumns
 
         sql |> Console.WriteLine |> ignore
@@ -107,7 +108,7 @@ type ``Basic SQL output tests`` () =
 
     [<Test>] 
     member test.``Check constraint output against reference`` () =
-        let sql = fsdl.generateConstraintDefinitions 
+        let sql = generateConstraintDefinitions 
                     [TestSqlData.testTable] TestSqlData.commonConstraints
 
         sql |> Console.WriteLine |> ignore
@@ -115,7 +116,7 @@ type ``Basic SQL output tests`` () =
     
     [<Test>] 
     member test.``Check index output against reference`` () =
-        let sql = fsdl.generateIndexDefinitions 
+        let sql = generateIndexDefinitions 
                     [TestSqlData.testTable]
 
         sql |> Console.WriteLine |> ignore
