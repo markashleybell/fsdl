@@ -3,10 +3,12 @@
     <PropertyGroup>
         <TargetFramework>net462</TargetFramework>
         <Authors>Mark Ashley Bell</Authors>
-        <Description>A code generation library for creating Dapper-based persistence layer classes with backing SQL table definitions.</Description>
+        <Description>A code generation library for creating Dapper-based C# persistence layer classes with backing SQL table definitions.</Description>
         <Copyright>© Mark Ashley Bell 2018</Copyright>
         <PackageProjectUrl></PackageProjectUrl>
         <RepositoryUrl>https://github.com/markashleybell/fsdl</RepositoryUrl>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <PackageLicenseUrl>https://github.com/markashleybell/fsdl/blob/master/LICENSE.md</PackageLicenseUrl>
     </PropertyGroup>
 
     <ItemGroup>
