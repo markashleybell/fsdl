@@ -18,35 +18,43 @@ module TestCSharpData =
             ForeignKey("CommonFKID", "tCommonFKTable", "ID")
         ]
 
-    let testTable = {
-        sqlStatementType = CREATE
-        tableName = "tCreatedTable"
-        dtoClassName = "CreatedTable"
+    let dtoSpec = {
         dtoNamespace = "test.com.DTO"
-        dtoBaseClassName = Some "DTOBase"
-        columnSpecifications = 
-            [
-                Identity("ID", INT, 1, 1)
-                Null("Name", CHR(16))
-                NotNull("GUID", GUID, NEWGUID)
-                NotNull("Date", DATE, NOW)
-                NotNull("Index", INT, VAL(100))
-                NotNull("Active", BIT, FALSE)
-                Null("Price", MONEY)
-                Null("Description", TEXT)
-                Null("FKID", INT)
-            ] 
-        constraintSpecifications = 
-            [
-                PrimaryKey(["ID"])
-                ForeignKey("FKID", "tFKTable", "ID")
-            ]
-        indexSpecifications = []
-        addDapperAttributes = true
+        baseClassName = Some "DTOBase"
+        accessModifier = Public
         partial = true
         generateConstructor = true
         baseConstructorParameters = true
-        setters = NoSetter
+        setters = NoSetters
+        addDapperAttributes = true
+    }
+
+    let testEntity = {
+        table = {
+            tableName = "tCreatedTable"
+            columnSpecifications = 
+                [
+                    Identity("ID", INT, 1, 1)
+                    Null("Name", CHR(16))
+                    NotNull("GUID", GUID, NEWGUID)
+                    NotNull("Date", DATE, NOW)
+                    NotNull("Index", INT, VAL(100))
+                    NotNull("Active", BIT, FALSE)
+                    Null("Price", MONEY)
+                    Null("Description", TEXT)
+                    Null("FKID", INT)
+                ] 
+            constraintSpecifications = 
+                [
+                    PrimaryKey(["ID"])
+                    ForeignKey("FKID", "tFKTable", "ID")
+                ]
+            indexSpecifications = []
+        }
+        dto = {
+            className = "CreatedTable"
+            spec = dtoSpec
+        }
     }
 
     let expectedClassDefinitions = """using System;
@@ -107,53 +115,65 @@ namespace test.com.DTO
 }
 """
 
+
+    let toString classDefinitionList = 
+        classDefinitionList 
+        |> List.map (fun (_, def) -> sprintf "%s" def) 
+        |> String.concat (Environment.NewLine + Environment.NewLine)
+
 [<TestFixture>]
 type ``Basic C# output tests`` () =
     [<Test>] 
     member test.``Check DTO class output against reference`` () =
         let code = generateDTOClassDefinitions 
-                    [TestCSharpData.testTable] TestCSharpData.commonColumns
+                        [TestCSharpData.testEntity] TestCSharpData.commonColumns
 
-        code |> Console.WriteLine |> ignore
-        code |> should equal TestCSharpData.expectedClassDefinitions
+        code |> TestCSharpData.toString |> Console.WriteLine |> ignore
+        code |> TestCSharpData.toString |> should equal TestCSharpData.expectedClassDefinitions
 
     [<Test>] 
     member test.``Check DTO class list output against reference`` () =
-        let list = generateDTOClassDefinitionList 
-                        [TestCSharpData.testTable] TestCSharpData.commonColumns
+        let list = generateDTOClassDefinitions
+                        [TestCSharpData.testEntity] TestCSharpData.commonColumns
 
         let (name, code) = list.Head
 
         code |> Console.WriteLine |> ignore
-        name |> should equal TestCSharpData.testTable.dtoClassName
+        name |> should equal TestCSharpData.testEntity.dto.className
         code |> should equal TestCSharpData.expectedClassDefinitions
 
     [<Test>]
     member test.``Check unnecessary using statements are not emitted`` () =
         let tbl = {
-            sqlStatementType = CREATE
-            tableName = "tCreatedTable"
-            dtoClassName = "CreatedTable"
-            dtoNamespace = "test.com.DTO"
-            dtoBaseClassName = Some "DTOBase"
-            columnSpecifications = 
-                [
-                    Identity("ID", INT, 1, 1)
-                    Null("Price", MONEY)
-                ] 
-            constraintSpecifications = 
-                [
-                    PrimaryKey(["ID"])
-                ]
-            indexSpecifications = []
-            addDapperAttributes = false
-            partial = true
-            generateConstructor = true
-            baseConstructorParameters = true
-            setters = NoSetter
+            table = {
+                tableName = "tCreatedTable"
+                columnSpecifications = 
+                    [
+                        Identity("ID", INT, 1, 1)
+                        Null("Price", MONEY)
+                    ] 
+                constraintSpecifications = 
+                    [
+                        PrimaryKey(["ID"])
+                    ]
+                indexSpecifications = []
+            }
+            dto = {
+                className = "CreatedTable"
+                spec = {
+                    dtoNamespace = "test.com.DTO"
+                    baseClassName = Some "DTOBase"
+                    accessModifier = Public
+                    partial = true
+                    generateConstructor = true
+                    baseConstructorParameters = true
+                    setters = NoSetters
+                    addDapperAttributes = false
+                }
+            }
         }
 
-        let list = generateDTOClassDefinitionList [tbl] []
+        let list = generateDTOClassDefinitions [tbl] []
 
         let (_, code) = list.Head
 

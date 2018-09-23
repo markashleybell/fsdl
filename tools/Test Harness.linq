@@ -20,23 +20,30 @@ let commonConstraints =
         ForeignKey("CommonFKID", "tCommonFKTable", "ID")
     ]
 
-let testTable = {
-    sqlStatementType = CREATE
-    tableName = "tCreatedTable"
-    dtoClassName = "CreatedTable"
+let dtoSpec = {
     dtoNamespace = "fsdl.test"
-    dtoBaseClassName = Some("IDTO")
+    baseClassName = Some "IDTO"
+    accessModifier = Public
+    partial = true
+    generateConstructor = true
+    baseConstructorParameters = true
+    setters = NoSetters
+    addDapperAttributes = true
+}
+
+let table1 = {
+    tableName = "tEntity1"
     columnSpecifications = 
         [
             NotNull("ID", GUID, NEWGUID)
             Identity("IDX", INT, 1, 1)
             Null("Name", CHR(16))
-            NotNull("Index", INT, VAL(100))
+            //NotNull("Index", INT, VAL(100))
             NotNull("IsActive", BIT, FALSE)
-            Null("TotalPrice", MONEY)
+            //Null("TotalPrice", MONEY)
             Null("Description", TEXT)
             NotNull("FKID", INT, NONE)
-            NotNull("EnumProp", ENUM(typeof<TestEnum>), VAL(int TestEnum.A))
+            //NotNull("EnumProp", ENUM(typeof<TestEnum>), VAL(int TestEnum.A))
         ] 
     constraintSpecifications = 
         [
@@ -47,17 +54,42 @@ let testTable = {
         [
             ClusteredUnique(["IDX"])
         ]
-    addDapperAttributes = true
-    partial = true
-    generateConstructor = true
-    baseConstructorParameters = true
-    setters = PrivateSetter
 }
 
-generateDTOClassDefinitions [testTable] commonColumns |> Dump |> ignore
+let table2 = {
+    tableName = "tEntity2"
+    columnSpecifications = 
+        [
+            NotNull("ID", GUID, NEWGUID)
+            //Identity("IDX", INT, 1, 1)
+            //Null("Name", CHR(16))
+            NotNull("Index", INT, VAL(100))
+            //NotNull("IsActive", BIT, FALSE)
+            Null("TotalPrice", MONEY)
+            //Null("Description", TEXT)
+            //NotNull("FKID", INT, NONE)
+            NotNull("EnumProp", ENUM(typeof<TestEnum>), VAL(int TestEnum.A))
+        ] 
+    constraintSpecifications = 
+        [
+            PrimaryKey(["ID"])
+            //ForeignKey("FKID", "tFKTable", "ID")
+        ]
+    indexSpecifications = 
+        [
+            //ClusteredUnique(["IDX"])
+        ]
+}
 
-generateTableDefinitions [testTable] commonColumns |> Dump |> ignore
+let entity1 = { table = table1; dto = { className = "Entity1"; spec = dtoSpec } }
+let entity2 = { table = table2; dto = { className = "Entity2"; spec = dtoSpec } }
 
-generateIndexDefinitions [testTable] |> Dump |> ignore
+let entities = [entity1; entity2]
 
-generateConstraintDefinitions [testTable] commonConstraints |> Dump |> ignore
+generateDTOClassDefinitions entities commonColumns |> Console.Write |> ignore
+
+generateTableDefinitions entities commonColumns |> Console.Write |> ignore
+
+generateIndexDefinitions entities |> Console.Write |> ignore
+
+generateConstraintDefinitions entities commonConstraints |> Console.Write |> ignore

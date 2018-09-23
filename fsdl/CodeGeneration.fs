@@ -5,4 +5,3 @@ module CodeGeneration =
     let generateConstraintDefinitions = SqlGenerator.generateConstraintDefinitions
     let generateIndexDefinitions = SqlGenerator.generateIndexDefinitions
     let generateDTOClassDefinitions = CSharpGenerator.generateDTOClassDefinitions
-    let generateDTOClassDefinitionList = CSharpGenerator.generateDTOClassDefinitionList

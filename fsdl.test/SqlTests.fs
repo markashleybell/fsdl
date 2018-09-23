@@ -18,38 +18,46 @@ module TestSqlData =
             ForeignKey("CommonFKID", "tCommonFKTable", "ID")
         ]
 
-    let testTable = {
-        sqlStatementType = CREATE
-        tableName = "tCreatedTable"
-        dtoClassName = "CreatedTable"
+    let dtoSpec = {
         dtoNamespace = "test.com.DTO"
-        dtoBaseClassName = Some "DTOBase"
-        columnSpecifications = 
-            [
-                Identity("ID", INT, 1, 1)
-                Null("Name", CHR(16))
-                NotNull("GUID", GUID, NEWGUID)
-                NotNull("Date", DATE, NOW)
-                NotNull("Index", INT, VAL(100))
-                NotNull("Active", BIT, FALSE)
-                Null("Price", MONEY)
-                Null("Description", TEXT)
-                Null("FKID", INT)
-            ] 
-        constraintSpecifications = 
-            [
-                PrimaryKey(["ID"])
-                ForeignKey("FKID", "tFKTable", "ID")
-            ]
-        indexSpecifications = 
-            [
-                ClusteredUnique(["ID"])
-            ]
-        addDapperAttributes = true
+        baseClassName = Some "DTOBase"
+        accessModifier = Public
         partial = true
         generateConstructor = true
         baseConstructorParameters = true
-        setters = NoSetter
+        setters = NoSetters
+        addDapperAttributes = true
+    }
+
+    let testEntity = {
+        table = {
+            tableName = "tCreatedTable"
+            columnSpecifications = 
+                [
+                    Identity("ID", INT, 1, 1)
+                    Null("Name", CHR(16))
+                    NotNull("GUID", GUID, NEWGUID)
+                    NotNull("Date", DATE, NOW)
+                    NotNull("Index", INT, VAL(100))
+                    NotNull("Active", BIT, FALSE)
+                    Null("Price", MONEY)
+                    Null("Description", TEXT)
+                    Null("FKID", INT)
+                ] 
+            constraintSpecifications = 
+                [
+                    PrimaryKey(["ID"])
+                    ForeignKey("FKID", "tFKTable", "ID")
+                ]
+            indexSpecifications = 
+                [
+                    ClusteredUnique(["ID"])
+                ]
+        }
+        dto = {
+            className = "CreatedTable"
+            spec = dtoSpec
+        }
     }
 
     let expectedCreateTableDefinitions = """-- Create tCreatedTable
@@ -74,10 +82,13 @@ PRINT 'Tables Created'
 """
 
     let expectedConstraintDefinitions = """-- Create tCreatedTable constraints
+
 ALTER TABLE [tCreatedTable] WITH CHECK ADD CONSTRAINT PK_tCreatedTable
 PRIMARY KEY ([ID])
+
 ALTER TABLE [tCreatedTable] WITH CHECK ADD CONSTRAINT FK_tCreatedTable_FKID_tFKTable_ID
 FOREIGN KEY ([FKID]) REFERENCES [tFKTable] ([ID])
+
 ALTER TABLE [tCreatedTable] WITH CHECK ADD CONSTRAINT FK_tCreatedTable_CommonFKID_tCommonFKTable_ID
 FOREIGN KEY ([CommonFKID]) REFERENCES [tCommonFKTable] ([ID])
 
@@ -88,6 +99,7 @@ PRINT 'Constraints Created'
 """
 
     let expectedIndexDefinitions = """-- Create tCreatedTable indexes
+
 CREATE UNIQUE CLUSTERED INDEX IX_tCreatedTable_ID ON [tCreatedTable] ([ID])
 
 GO
@@ -101,7 +113,7 @@ type ``Basic SQL output tests`` () =
     [<Test>] 
     member test.``Check CREATE TABLE output against reference`` () =
         let sql = generateTableDefinitions 
-                    [TestSqlData.testTable] TestSqlData.commonColumns
+                    [TestSqlData.testEntity] TestSqlData.commonColumns
 
         sql |> Console.WriteLine |> ignore
         sql |> should equal TestSqlData.expectedCreateTableDefinitions
@@ -109,7 +121,7 @@ type ``Basic SQL output tests`` () =
     [<Test>] 
     member test.``Check constraint output against reference`` () =
         let sql = generateConstraintDefinitions 
-                    [TestSqlData.testTable] TestSqlData.commonConstraints
+                    [TestSqlData.testEntity] TestSqlData.commonConstraints
 
         sql |> Console.WriteLine |> ignore
         sql |> should equal TestSqlData.expectedConstraintDefinitions
@@ -117,7 +129,7 @@ type ``Basic SQL output tests`` () =
     [<Test>] 
     member test.``Check index output against reference`` () =
         let sql = generateIndexDefinitions 
-                    [TestSqlData.testTable]
+                    [TestSqlData.testEntity]
 
         sql |> Console.WriteLine |> ignore
         sql |> should equal TestSqlData.expectedIndexDefinitions

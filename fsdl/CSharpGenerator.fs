@@ -25,6 +25,9 @@ module CSharpGenerator =
     let replaceCi rx rep input =
         replace rx rep RegexOptions.IgnoreCase input
 
+    let specs entity = 
+        (entity.table, entity.dto.spec)
+
     let addNewLineIfNotEmpty s =
         match s with
         | "" -> ""
@@ -102,9 +105,9 @@ module CSharpGenerator =
 
         let setter = 
             match setters with
-            | NoSetter -> ""
-            | PublicSetter -> "set; "
-            | PrivateSetter -> "private set; "
+            | NoSetters -> ""
+            | PublicSetters -> "set; "
+            | PrivateSetters -> "private set; "
 
         sprintf "%s%s %s %s { get; %s}" 
             (attributes isPrimaryKey' isExplicitKey addDapperAttributes validationAttributes) (indent2 "public") cSharpDataType propertyName setter
@@ -117,24 +120,27 @@ module CSharpGenerator =
 
         primaryKeys |> List.contains true
 
-    let properties commonColumns table = 
+    let properties commonColumns entity = 
+        let (tbl, dto) = specs entity
         // If a base class is being used, don't add the
         // common columns to the generated DTO classes
         let columns = 
-            match table.dtoBaseClassName with
+            match dto.baseClassName with
             | Some s -> []
             | None -> commonColumns
 
         columns
-        |> List.append table.columnSpecifications
-        |> List.map (propertyDefinition table.setters table.addDapperAttributes (isPrimaryKey table.constraintSpecifications))
+        |> List.append tbl.columnSpecifications
+        |> List.map (propertyDefinition dto.setters dto.addDapperAttributes (isPrimaryKey tbl.constraintSpecifications))
         |> String.concat brbr
         |> (fun s -> sprintf "%s" s)
 
-    let namespaces table =
+    let namespaces entity =
         let usings = []
 
-        let tableDataTypes = table.columnSpecifications |> List.map getDataType
+        let (tbl, dto) = specs entity
+
+        let tableDataTypes = tbl.columnSpecifications |> List.map getDataType
 
         let classUsesNonPrimitiveSystemTypes = tableDataTypes |> List.exists isNonPrimitiveType
         let classUsesCharTypes = tableDataTypes |> List.exists isCharType
@@ -142,7 +148,7 @@ module CSharpGenerator =
         let enumTypeNameSpaces = 
             tableDataTypes
             |> List.choose (fun dt -> match dt with | ENUM t -> Some t.Namespace | _ -> None)
-            |> List.choose (fun ns -> match (ns <> table.dtoNamespace) with | true -> Some ns | false -> None)
+            |> List.choose (fun ns -> match (ns <> dto.dtoNamespace) with | true -> Some ns | false -> None)
             |> List.map (fun ns -> sprintf "using %s;" ns)
 
         let usings = 
@@ -156,14 +162,14 @@ module CSharpGenerator =
             | false -> usings
 
         let usings = 
-            match table.addDapperAttributes with
+            match dto.addDapperAttributes with
             | true -> usings @ ["using d = Dapper.Contrib.Extensions;"]
             | false -> usings
         
         let usings = usings @ enumTypeNameSpaces
 
         let code = [
-            sprintf "namespace %s" table.dtoNamespace
+            sprintf "namespace %s" dto.dtoNamespace
             "{"
             "%s"
             "}"
@@ -206,64 +212,70 @@ module CSharpGenerator =
 
         sprintf "%s = %s;" (indent3 propertyName) (camelName propertyName)
 
-    let constructorDefinition commonColumns table = 
+    let constructorDefinition commonColumns entity = 
+        let (tbl, dto) = specs entity
+
         let columns = 
-            match table.baseConstructorParameters with
+            match dto.baseConstructorParameters with
             | true -> commonColumns
             | false -> []
 
         let c = 
             columns
-            |> List.append table.columnSpecifications
+            |> List.append tbl.columnSpecifications
             |> List.map constructorParam
             |> String.concat (sprintf ",%s" br)
         
         let a = 
             columns
-            |> List.append table.columnSpecifications
+            |> List.append tbl.columnSpecifications
             |> List.map assignment
             |> String.concat br
 
-        sprintf "%s %s(%s%s)%s%s%s%s%s%s%s" 
-            (indent2 "public") table.dtoClassName br c br (indent2 "{") br a br (indent2 "}") br
+        let am = 
+            match dto.accessModifier with
+            | Public -> "public"
+            | Internal -> "internal"
+            | Private -> "private"
 
-    let classDefinition commonColumns table = 
+        sprintf "%s %s(%s%s)%s%s%s%s%s%s%s" 
+            (indent2 am) entity.dto.className br c br (indent2 "{") br a br (indent2 "}") br
+
+    let classDefinition commonColumns entity = 
+        let (tbl, dto) = specs entity
+
         let classattr dap arr = 
             match dap with
-            | true -> (indent (sprintf "[d.Table(\"%s\")]" table.tableName))::arr
+            | true -> (indent (sprintf "[d.Table(\"%s\")]" tbl.tableName))::arr
             | false -> arr
 
         let basecls = 
-            match table.dtoBaseClassName with
+            match dto.baseClassName with
             | Some s -> sprintf " : %s" s
             | None -> ""
 
         let constructor = 
-            match table.generateConstructor with
-            | true -> sprintf "%s%s" br (constructorDefinition commonColumns table)
+            match dto.generateConstructor with
+            | true -> sprintf "%s%s" br (constructorDefinition commonColumns entity)
             | false -> ""
 
         let partial =
-            match table.partial with
+            match dto.partial with
             | true -> " partial"
             | false -> ""
 
-        let cls = indent (sprintf "public%s class %s%s%s%s%s" partial table.dtoClassName basecls br (indent "{") constructor) 
+        let cls = indent (sprintf "public%s class %s%s%s%s%s" partial entity.dto.className basecls br (indent "{") constructor) 
 
         let def = 
-            [cls; (properties commonColumns table); (indent "}")] 
-            |> (classattr table.addDapperAttributes)
+            [cls; (properties commonColumns entity); (indent "}")] 
+            |> (classattr dto.addDapperAttributes)
             |> String.concat br
 
-        (table.dtoClassName, sprintf (namespaces table) def)
+        (entity.dto.className, sprintf (namespaces entity) def)
 
-    let classDefinitions tableList commonColumns =
-        tableList |> List.map (classDefinition commonColumns)
+    let classDefinitions entityList commonColumns =
+        entityList |> List.map (classDefinition commonColumns)
 
-    let generateDTOClassDefinitionList tables commonColumns = 
-        (classDefinitions tables commonColumns)
+    let generateDTOClassDefinitions entities commonColumns = 
+        (classDefinitions entities commonColumns)
 
-    let generateDTOClassDefinitions tables commonColumns = 
-        generateDTOClassDefinitionList tables commonColumns 
-        |> List.map (fun (_, def) -> sprintf "%s" def) 
-        |> String.concat brbr

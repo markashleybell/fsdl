@@ -3,8 +3,6 @@
 open System
 
 module Types =
-    type StatementType = ALTER | CREATE
-
     type DataType = INT | BIT | DATE | MONEY | TEXT | GUID | CHR of int | ENUM of Type
 
     type Default = NONE | NULL | TRUE | FALSE | NOW | NEWGUID | VAL of int
@@ -24,20 +22,34 @@ module Types =
         | NonClustered of string list
         | NonClusteredUnique of string list
 
-    type PropertySetter = PublicSetter | PrivateSetter | NoSetter
+    type PropertySetters = PublicSetters | PrivateSetters | NoSetters
 
-    type Table = {
-        tableName:string; 
-        dtoClassName:string; 
-        dtoNamespace:string;
-        dtoBaseClassName:string option;
-        sqlStatementType:StatementType; 
-        columnSpecifications:ColSpec list; 
-        constraintSpecifications:ConstraintSpec list; 
-        indexSpecifications:IndexSpec list;
-        addDapperAttributes:bool;
-        partial:bool;
-        generateConstructor:bool;
-        baseConstructorParameters:bool;
-        setters:PropertySetter;
+    type AccessModifier = Public | Private | Internal
+
+    type TableSpec = {
+        tableName: string
+        columnSpecifications: ColSpec list
+        constraintSpecifications: ConstraintSpec list
+        indexSpecifications: IndexSpec list
+    }
+
+    type DtoSpec = {
+        dtoNamespace: string
+        baseClassName: string option
+        accessModifier: AccessModifier
+        partial: bool
+        generateConstructor: bool
+        baseConstructorParameters: bool
+        setters: PropertySetters
+        addDapperAttributes: bool
+    }
+
+    type Dto = {
+        className: string
+        spec: DtoSpec
+    }
+
+    type Entity = {
+        table: TableSpec
+        dto: Dto
     }

@@ -10,6 +10,11 @@ module SqlGenerator =
     let brbr = br + br
     let commabr = sprintf ",%s" br // Shorthand for comma followed by newline
 
+    let ifNotEmptyAppend suf s =
+        match s with
+        | "" -> ""
+        | s' -> sprintf "%s%s" s' suf
+
     let columnDataType t = 
         match t with
         | INT -> "INT"
@@ -78,7 +83,7 @@ module SqlGenerator =
 
         match constraintList with
         | [] -> ""
-        | constraints -> sprintf "%s%s" (comment::constraints |> String.concat br) br
+        | constraints -> sprintf "%s%s%s%s" comment brbr (constraints |> String.concat brbr) br
 
     let indexStatement tableName indexSpecification =
         let indexType, columnList = 
@@ -100,9 +105,8 @@ module SqlGenerator =
 
         match indexList with
         | [] -> ""
-        | indexes -> sprintf "%s%s" (comment::indexes |> String.concat br) br
+        | indexes -> sprintf "%s%s%s%s" comment brbr (indexes |> String.concat brbr) br
 
-    // CREATE and ALTER statement generators
     let createStatement commonColumns table = 
         let comment = sprintf "-- Create %s" table.tableName
         let create = sprintf "CREATE TABLE [%s] (" table.tableName
@@ -110,21 +114,9 @@ module SqlGenerator =
         [comment; create; (columnDefinitions commonColumns table); ")"] 
         |> String.concat br
 
-    let alterStatement commonColumns table = 
-        let comment = sprintf "-- Alter %s" table.tableName
-        let alter = sprintf "ALTER TABLE [%s] ADD" table.tableName
-
-        [comment; alter; (columnDefinitions commonColumns table)] 
-        |> String.concat br
-
-    let tableDefinition commonColumns table =
-        match table.sqlStatementType with
-        | CREATE -> createStatement commonColumns table
-        | ALTER -> alterStatement commonColumns table
-
     let tableDefinitions tableList commonColumns =
         tableList
-        |> List.map (tableDefinition commonColumns)
+        |> List.map (createStatement commonColumns)
         |> String.concat brbr
 
     let constraintDefinitions tableList commonConstraints =
@@ -139,14 +131,14 @@ module SqlGenerator =
         |> List.filter (fun s -> s <> "")
         |> String.concat br
 
-    let generateTableDefinitions tableList commonColumns = 
-        sprintf "%s%sGO%s%s%s" 
-            (tableDefinitions tableList commonColumns) brbr brbr "PRINT 'Tables Created'" brbr
+    let generateTableDefinitions entityList commonColumns = 
+        (tableDefinitions (entityList |> List.map (fun e -> e.table)) commonColumns) 
+        |> ifNotEmptyAppend (sprintf "%sGO%s%s%s" brbr brbr "PRINT 'Tables Created'" brbr)
 
-    let generateConstraintDefinitions tableList commonConstraints = 
-        sprintf "%s%sGO%s%s%s" 
-            (constraintDefinitions tableList commonConstraints) br brbr "PRINT 'Constraints Created'" brbr
+    let generateConstraintDefinitions entityList commonConstraints = 
+        (constraintDefinitions (entityList |> List.map (fun e -> e.table)) commonConstraints) 
+        |> ifNotEmptyAppend (sprintf "%sGO%s%s%s" br brbr "PRINT 'Constraints Created'" brbr)
 
-    let generateIndexDefinitions tableList = 
-        sprintf "%s%sGO%s%s%s" 
-            (indexDefinitions tableList) br brbr "PRINT 'Indexes Created'" brbr
+    let generateIndexDefinitions entityList = 
+        (indexDefinitions (entityList |> List.map (fun e -> e.table)))
+        |> ifNotEmptyAppend (sprintf "%sGO%s%s%s" br brbr "PRINT 'Indexes Created'" brbr)
