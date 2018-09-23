@@ -19,20 +19,20 @@ module TestSqlData =
         ]
 
     let dtoSpec = {
-        dtoNamespace = "test.com.DTO"
-        baseClassName = Some "DTOBase"
+        ns = "test.com.DTO"
+        inheritFrom = Some "DTOBase"
+        interfaces  = Some ["IDTO"]
         accessModifier = Public
         partial = true
-        generateConstructor = true
-        baseConstructorParameters = true
+        constructor = true
         setters = NoSetters
-        addDapperAttributes = true
+        dapperAttributes = true
     }
 
     let testEntity = {
         table = {
-            tableName = "tCreatedTable"
-            columnSpecifications = 
+            name = "tCreatedTable"
+            columns = 
                 [
                     Identity("ID", INT, 1, 1)
                     Null("Name", CHR(16))
@@ -44,18 +44,18 @@ module TestSqlData =
                     Null("Description", TEXT)
                     Null("FKID", INT)
                 ] 
-            constraintSpecifications = 
+            constraints = 
                 [
                     PrimaryKey(["ID"])
                     ForeignKey("FKID", "tFKTable", "ID")
                 ]
-            indexSpecifications = 
+            indexes = 
                 [
                     ClusteredUnique(["ID"])
                 ]
         }
         dto = {
-            className = "CreatedTable"
+            name = "CreatedTable"
             spec = dtoSpec
         }
     }

@@ -27,25 +27,25 @@ module Types =
     type AccessModifier = Public | Private | Internal
 
     type TableSpec = {
-        tableName: string
-        columnSpecifications: ColSpec list
-        constraintSpecifications: ConstraintSpec list
-        indexSpecifications: IndexSpec list
+        name: string
+        columns: ColSpec list
+        constraints: ConstraintSpec list
+        indexes: IndexSpec list
     }
 
     type DtoSpec = {
-        dtoNamespace: string
-        baseClassName: string option
+        ns: string
+        inheritFrom: string option
+        interfaces: string list option
         accessModifier: AccessModifier
         partial: bool
-        generateConstructor: bool
-        baseConstructorParameters: bool
+        constructor: bool
         setters: PropertySetters
-        addDapperAttributes: bool
+        dapperAttributes: bool
     }
 
     type Dto = {
-        className: string
+        name: string
         spec: DtoSpec
     }
 

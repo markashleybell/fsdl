@@ -9,31 +9,31 @@
   <Namespace>FSharp.Data.Runtime</Namespace>
 </Query>
 
-let commonColumns = 
+let baseColumns = 
     [
         NotNull("CommonDate", DATE, NOW)
         NotNull("CommonFKID", INT, VAL(1))
     ]
     
-let commonConstraints = 
+let baseConstraints = 
     [
         ForeignKey("CommonFKID", "tCommonFKTable", "ID")
     ]
 
 let dtoSpec = {
-    dtoNamespace = "fsdl.test"
-    baseClassName = Some "IDTO"
+    ns = "fsdl.test"
+    inheritFrom = Some "DTOBase"
+    interfaces = None
     accessModifier = Public
-    partial = true
-    generateConstructor = true
-    baseConstructorParameters = true
+    constructor = true
     setters = NoSetters
-    addDapperAttributes = true
+    partial = true
+    dapperAttributes = true
 }
 
 let table1 = {
-    tableName = "tEntity1"
-    columnSpecifications = 
+    name = "tEntity1"
+    columns = 
         [
             NotNull("ID", GUID, NEWGUID)
             Identity("IDX", INT, 1, 1)
@@ -45,20 +45,20 @@ let table1 = {
             NotNull("FKID", INT, NONE)
             //NotNull("EnumProp", ENUM(typeof<TestEnum>), VAL(int TestEnum.A))
         ] 
-    constraintSpecifications = 
+    constraints = 
         [
             PrimaryKey(["ID"])
             ForeignKey("FKID", "tFKTable", "ID")
         ]
-    indexSpecifications = 
+    indexes = 
         [
             ClusteredUnique(["IDX"])
         ]
 }
 
 let table2 = {
-    tableName = "tEntity2"
-    columnSpecifications = 
+    name = "tEntity2"
+    columns = 
         [
             NotNull("ID", GUID, NEWGUID)
             //Identity("IDX", INT, 1, 1)
@@ -70,26 +70,23 @@ let table2 = {
             //NotNull("FKID", INT, NONE)
             NotNull("EnumProp", ENUM(typeof<TestEnum>), VAL(int TestEnum.A))
         ] 
-    constraintSpecifications = 
+    constraints = 
         [
             PrimaryKey(["ID"])
             //ForeignKey("FKID", "tFKTable", "ID")
         ]
-    indexSpecifications = 
+    indexes = 
         [
             //ClusteredUnique(["IDX"])
         ]
 }
 
-let entity1 = { table = table1; dto = { className = "Entity1"; spec = dtoSpec } }
-let entity2 = { table = table2; dto = { className = "Entity2"; spec = dtoSpec } }
+let entity1 = { table = table1; dto = { name = "Entity1"; spec = dtoSpec } }
+let entity2 = { table = table2; dto = { name = "Entity2"; spec = dtoSpec } }
 
 let entities = [entity1; entity2]
 
-generateDTOClassDefinitions entities commonColumns |> Console.Write |> ignore
-
-generateTableDefinitions entities commonColumns |> Console.Write |> ignore
-
+generateDTOClassDefinitions entities baseColumns |> Console.Write |> ignore
+generateTableDefinitions entities baseColumns |> Console.Write |> ignore
 generateIndexDefinitions entities |> Console.Write |> ignore
-
-generateConstraintDefinitions entities commonConstraints |> Console.Write |> ignore
+generateConstraintDefinitions entities baseConstraints |> Console.Write |> ignore

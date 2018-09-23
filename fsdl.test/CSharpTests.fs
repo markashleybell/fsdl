@@ -19,20 +19,20 @@ module TestCSharpData =
         ]
 
     let dtoSpec = {
-        dtoNamespace = "test.com.DTO"
-        baseClassName = Some "DTOBase"
+        ns = "test.com.DTO"
+        inheritFrom = Some "DTOBase"
+        interfaces  = Some ["IDTO"]
         accessModifier = Public
         partial = true
-        generateConstructor = true
-        baseConstructorParameters = true
+        constructor = true
         setters = NoSetters
-        addDapperAttributes = true
+        dapperAttributes = true
     }
 
     let testEntity = {
         table = {
-            tableName = "tCreatedTable"
-            columnSpecifications = 
+            name = "tCreatedTable"
+            columns = 
                 [
                     Identity("ID", INT, 1, 1)
                     Null("Name", CHR(16))
@@ -44,15 +44,15 @@ module TestCSharpData =
                     Null("Description", TEXT)
                     Null("FKID", INT)
                 ] 
-            constraintSpecifications = 
+            constraints = 
                 [
                     PrimaryKey(["ID"])
                     ForeignKey("FKID", "tFKTable", "ID")
                 ]
-            indexSpecifications = []
+            indexes = []
         }
         dto = {
-            className = "CreatedTable"
+            name = "CreatedTable"
             spec = dtoSpec
         }
     }
@@ -64,7 +64,7 @@ using d = Dapper.Contrib.Extensions;
 namespace test.com.DTO
 {
     [d.Table("tCreatedTable")]
-    public partial class CreatedTable : DTOBase
+    public partial class CreatedTable : DTOBase, IDTO
     {
         public CreatedTable(
             int id,
@@ -139,36 +139,36 @@ type ``Basic C# output tests`` () =
         let (name, code) = list.Head
 
         code |> Console.WriteLine |> ignore
-        name |> should equal TestCSharpData.testEntity.dto.className
+        name |> should equal TestCSharpData.testEntity.dto.name
         code |> should equal TestCSharpData.expectedClassDefinitions
 
     [<Test>]
     member test.``Check unnecessary using statements are not emitted`` () =
         let tbl = {
             table = {
-                tableName = "tCreatedTable"
-                columnSpecifications = 
+                name = "tCreatedTable"
+                columns = 
                     [
                         Identity("ID", INT, 1, 1)
                         Null("Price", MONEY)
                     ] 
-                constraintSpecifications = 
+                constraints = 
                     [
                         PrimaryKey(["ID"])
                     ]
-                indexSpecifications = []
+                indexes = []
             }
             dto = {
-                className = "CreatedTable"
+                name = "CreatedTable"
                 spec = {
-                    dtoNamespace = "test.com.DTO"
-                    baseClassName = Some "DTOBase"
+                    ns = "test.com.DTO"
+                    inheritFrom = Some "DTOBase"
+                    interfaces  = Some ["IDTO"]
                     accessModifier = Public
                     partial = true
-                    generateConstructor = true
-                    baseConstructorParameters = true
+                    constructor = true
                     setters = NoSetters
-                    addDapperAttributes = false
+                    dapperAttributes = false
                 }
             }
         }

@@ -41,20 +41,20 @@ module SqlGenerator =
         | VAL i -> cn (sprintf "%i" i)
 
     // Column definition statement
-    let columnDefinition table columnSpec = 
+    let columnDefinition tableName columnSpec = 
         match columnSpec with
         | Null (columnName, dataType) -> 
             sprintf "%s NULL" (column columnName dataType)
         | NotNull (columnName, dataType, columnDefault') -> 
-            sprintf "%s NOT NULL%s" (column columnName dataType) (columnDefault table.tableName columnName columnDefault')
+            sprintf "%s NOT NULL%s" (column columnName dataType) (columnDefault tableName columnName columnDefault')
         | Identity (columnName, dataType, initialValue, increment) -> 
             sprintf "%s IDENTITY(%i,%i) NOT NULL" (column columnName dataType) initialValue increment
     
     // All column definitions for a table
     let columnDefinitions columnSpecifications table = 
         columnSpecifications
-        |> List.append table.columnSpecifications
-        |> List.map (columnDefinition table)
+        |> List.append table.columns
+        |> List.map (columnDefinition table.name)
         |> String.concat commabr
         |> sprintf "%s"
 
@@ -73,13 +73,13 @@ module SqlGenerator =
         | ForeignKey (columnName', fkTable, fkColumn) -> (foreignKeyDefinition tableName tableName columnName' fkTable fkColumn br columnName' fkTable fkColumn)
 
     // List of constraint statements for a table
-    let constraintStatements commonConstraints table =
-        let comment = sprintf "-- Create %s constraints" table.tableName
+    let constraintStatements commonConstraints (table: TableSpec) =
+        let comment = sprintf "-- Create %s constraints" table.name
         
         let constraintList = 
             commonConstraints
-            |> List.append table.constraintSpecifications
-            |> List.map (constraintStatement table.tableName)
+            |> List.append table.constraints
+            |> List.map (constraintStatement table.name)
 
         match constraintList with
         | [] -> ""
@@ -96,20 +96,20 @@ module SqlGenerator =
         sprintf "CREATE%s INDEX IX_%s_%s ON [%s] (%s)" 
             indexType tableName (buildColumnList "%s" "_" columnList) tableName (buildColumnList "[%s]" ", " columnList)
 
-    let indexStatements table = 
-        let comment = sprintf "-- Create %s indexes" table.tableName
+    let indexStatements (table: TableSpec) = 
+        let comment = sprintf "-- Create %s indexes" table.name
 
         let indexList = 
-            table.indexSpecifications
-            |> List.map (indexStatement table.tableName)
+            table.indexes
+            |> List.map (indexStatement table.name)
 
         match indexList with
         | [] -> ""
         | indexes -> sprintf "%s%s%s%s" comment brbr (indexes |> String.concat brbr) br
 
-    let createStatement commonColumns table = 
-        let comment = sprintf "-- Create %s" table.tableName
-        let create = sprintf "CREATE TABLE [%s] (" table.tableName
+    let createStatement commonColumns (table: TableSpec) = 
+        let comment = sprintf "-- Create %s" table.name
+        let create = sprintf "CREATE TABLE [%s] (" table.name
 
         [comment; create; (columnDefinitions commonColumns table); ")"] 
         |> String.concat br
