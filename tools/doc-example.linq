@@ -1,6 +1,6 @@
 <Query Kind="FSharpProgram">
-  <Reference Relative="..\fsdl\bin\Debug\net462\fsdl.dll">C:\Src\fsdl\fsdl\bin\Debug\net462\fsdl.dll</Reference>
-  <Reference Relative="..\fsdl.test\bin\Debug\net462\fsdl.test.dll">C:\Src\fsdl\fsdl.test\bin\Debug\net462\fsdl.test.dll</Reference>
+  <Reference Relative="..\fsdl.test\bin\Debug\net472\fsdl.dll">C:\Src\fsdl\fsdl.test\bin\Debug\net472\fsdl.dll</Reference>
+  <Reference Relative="..\fsdl.test\bin\Debug\net472\fsdl.test.dll">C:\Src\fsdl\fsdl.test\bin\Debug\net472\fsdl.test.dll</Reference>
   <NuGetReference>FSharp.Data</NuGetReference>
   <Namespace>fsdl.CodeGeneration</Namespace>
   <Namespace>fsdl.test</Namespace>

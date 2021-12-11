@@ -1,5 +1,5 @@
-﻿#r @"bin\Debug\net462\fsdl.dll"
-#r @"C:\Users\Mark Bell\.nuget\packages\fsharp.data\2.4.6\lib\net45\FSharp.Data.dll"
+﻿#r @"bin\Debug\net472\fsdl.dll"
+#r "nuget: FSharp.Data"
 
 open fsdl.CSharpGenerator
 open FSharp.Data.Runtime.NameUtils
