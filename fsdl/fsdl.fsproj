@@ -8,10 +8,9 @@
         <PackageProjectUrl>https://github.com/markashleybell/fsdl</PackageProjectUrl>
         <RepositoryUrl>https://github.com/markashleybell/fsdl.git</RepositoryUrl>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <PackageLicenseUrl>https://github.com/markashleybell/fsdl/blob/master/LICENSE.md</PackageLicenseUrl>
         <RepositoryType>git</RepositoryType>
-        <Version>2.0.0</Version>
-        <AssemblyVersion>2.0.0.0</AssemblyVersion>
+        <Version>3.0.0</Version>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
     </PropertyGroup>
 
     <ItemGroup>
