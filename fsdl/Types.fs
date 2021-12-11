@@ -7,16 +7,16 @@ module Types =
 
     type Default = NONE | NULL | TRUE | FALSE | NOW | NEWGUID | VAL of int
 
-    type ColSpec = 
+    type ColSpec =
         | Null of string * DataType
         | NotNull of string * DataType * Default
         | Identity of string * DataType * int * int
 
-    type ConstraintSpec = 
+    type ConstraintSpec =
         | PrimaryKey of string list
         | ForeignKey of string * string * string
 
-    type IndexSpec = 
+    type IndexSpec =
         | Clustered of string list
         | ClusteredUnique of string list
         | NonClustered of string list

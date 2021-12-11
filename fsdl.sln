@@ -1,11 +1,16 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27004.2006
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31911.196
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "fsdl.test", "fsdl.test\fsdl.test.fsproj", "{C12355CB-D087-4B57-851C-824B1DF0061B}"
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "fsdl.test", "fsdl.test\fsdl.test.fsproj", "{C12355CB-D087-4B57-851C-824B1DF0061B}"
 EndProject
 Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "fsdl", "fsdl\fsdl.fsproj", "{0E95728A-D8DD-4EC1-8CF9-F2EBBDE8E001}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E93F7AEE-DFC3-49F6-9194-CB6768517449}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

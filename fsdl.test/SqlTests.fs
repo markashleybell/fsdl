@@ -6,14 +6,14 @@ open System
 open fsdl.Types
 open fsdl.CodeGeneration
 
-module TestSqlData = 
-    let commonColumns = 
+module TestSqlData =
+    let commonColumns =
         [
             NotNull("CommonDate", DATE, NOW)
             NotNull("CommonFKID", INT, VAL(1))
         ]
-    
-    let commonConstraints = 
+
+    let commonConstraints =
         [
             ForeignKey("CommonFKID", "tCommonFKTable", "ID")
         ]
@@ -32,7 +32,7 @@ module TestSqlData =
     let testEntity = {
         table = {
             name = "tCreatedTable"
-            columns = 
+            columns =
                 [
                     Identity("ID", INT, 1, 1)
                     Null("Name", CHR(16))
@@ -43,13 +43,13 @@ module TestSqlData =
                     Null("Price", MONEY)
                     Null("Description", TEXT)
                     Null("FKID", INT)
-                ] 
-            constraints = 
+                ]
+            constraints =
                 [
                     PrimaryKey(["ID"])
                     ForeignKey("FKID", "tFKTable", "ID")
                 ]
-            indexes = 
+            indexes =
                 [
                     ClusteredUnique(["ID"])
                 ]
@@ -110,25 +110,25 @@ PRINT 'Indexes Created'
 
 [<TestFixture>]
 type ``Basic SQL output tests`` () =
-    [<Test>] 
+    [<Test>]
     member test.``Check CREATE TABLE output against reference`` () =
-        let sql = generateTableDefinitions 
+        let sql = generateTableDefinitions
                     [TestSqlData.testEntity] TestSqlData.commonColumns
 
         sql |> Console.WriteLine |> ignore
         sql |> should equal TestSqlData.expectedCreateTableDefinitions
 
-    [<Test>] 
+    [<Test>]
     member test.``Check constraint output against reference`` () =
-        let sql = generateConstraintDefinitions 
+        let sql = generateConstraintDefinitions
                     [TestSqlData.testEntity] TestSqlData.commonConstraints
 
         sql |> Console.WriteLine |> ignore
         sql |> should equal TestSqlData.expectedConstraintDefinitions
-    
-    [<Test>] 
+
+    [<Test>]
     member test.``Check index output against reference`` () =
-        let sql = generateIndexDefinitions 
+        let sql = generateIndexDefinitions
                     [TestSqlData.testEntity]
 
         sql |> Console.WriteLine |> ignore

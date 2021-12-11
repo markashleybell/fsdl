@@ -6,14 +6,14 @@ open System
 open fsdl.Types
 open fsdl.CodeGeneration
 
-module TestCSharpData = 
-    let commonColumns = 
+module TestCSharpData =
+    let commonColumns =
         [
             NotNull("CommonDate", DATE, NOW)
             NotNull("CommonFKID", INT, VAL(1))
         ]
-    
-    let commonConstraints = 
+
+    let commonConstraints =
         [
             ForeignKey("CommonFKID", "tCommonFKTable", "ID")
         ]
@@ -32,7 +32,7 @@ module TestCSharpData =
     let testEntity = {
         table = {
             name = "tCreatedTable"
-            columns = 
+            columns =
                 [
                     Identity("ID", INT, 1, 1)
                     Null("Name", CHR(16))
@@ -43,8 +43,8 @@ module TestCSharpData =
                     Null("Price", MONEY)
                     Null("Description", TEXT)
                     Null("FKID", INT)
-                ] 
-            constraints = 
+                ]
+            constraints =
                 [
                     PrimaryKey(["ID"])
                     ForeignKey("FKID", "tFKTable", "ID")
@@ -116,22 +116,22 @@ namespace test.com.DTO
 """
 
 
-    let toString classDefinitionList = 
-        classDefinitionList 
-        |> List.map (fun (_, def) -> sprintf "%s" def) 
+    let toString classDefinitionList =
+        classDefinitionList
+        |> List.map (fun (_, def) -> sprintf "%s" def)
         |> String.concat (Environment.NewLine + Environment.NewLine)
 
 [<TestFixture>]
 type ``Basic C# output tests`` () =
-    [<Test>] 
+    [<Test>]
     member test.``Check DTO class output against reference`` () =
-        let code = generateDTOClassDefinitions 
+        let code = generateDTOClassDefinitions
                         [TestCSharpData.testEntity] TestCSharpData.commonColumns
 
         code |> TestCSharpData.toString |> Console.WriteLine |> ignore
         code |> TestCSharpData.toString |> should equal TestCSharpData.expectedClassDefinitions
 
-    [<Test>] 
+    [<Test>]
     member test.``Check DTO class list output against reference`` () =
         let list = generateDTOClassDefinitions
                         [TestCSharpData.testEntity] TestCSharpData.commonColumns
@@ -147,12 +147,12 @@ type ``Basic C# output tests`` () =
         let tbl = {
             table = {
                 name = "tCreatedTable"
-                columns = 
+                columns =
                     [
                         Identity("ID", INT, 1, 1)
                         Null("Price", MONEY)
-                    ] 
-                constraints = 
+                    ]
+                constraints =
                     [
                         PrimaryKey(["ID"])
                     ]
