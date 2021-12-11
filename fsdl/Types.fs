@@ -3,7 +3,7 @@
 open System
 
 module Types =
-    type DataType = INT | BIT | DATE | MONEY | TEXT | GUID | CHR of int | ENUM of Type
+    type DataType = INT | BIGINT | BIT | DATE | MONEY | TEXT | GUID | CHR of int | ENUM of Type
 
     type Default = NONE | NULL | TRUE | FALSE | NOW | NEWGUID | VAL of int
 

@@ -18,6 +18,7 @@ module SqlGenerator =
     let columnDataType t =
         match t with
         | INT -> "INT"
+        | BIGINT -> "BIGINT"
         | BIT -> "BIT"
         | MONEY -> "DECIMAL(18,2)"
         | DATE -> "DATETIME"

@@ -43,6 +43,7 @@ module TestSqlData =
                     Null("Price", MONEY)
                     Null("Description", TEXT)
                     Null("FKID", INT)
+                    Null("OtherID", BIGINT)
                 ]
             constraints =
                 [
@@ -71,6 +72,7 @@ CREATE TABLE [tCreatedTable] (
     [Price] DECIMAL(18,2) NULL,
     [Description] NVARCHAR(MAX) NULL,
     [FKID] INT NULL,
+    [OtherID] BIGINT NULL,
     [CommonDate] DATETIME NOT NULL CONSTRAINT DF_tCreatedTable_CommonDate DEFAULT GETDATE(),
     [CommonFKID] INT NOT NULL CONSTRAINT DF_tCreatedTable_CommonFKID DEFAULT 1
 )

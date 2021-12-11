@@ -43,6 +43,7 @@ module TestCSharpData =
                     Null("Price", MONEY)
                     Null("Description", TEXT)
                     Null("FKID", INT)
+                    Null("OtherID", BIGINT)
                 ]
             constraints =
                 [
@@ -76,6 +77,7 @@ namespace test.com.DTO
             decimal? price,
             string description,
             int? fkId,
+            long? otherId,
             DateTime commonDate,
             int commonFkId)
         {
@@ -88,6 +90,7 @@ namespace test.com.DTO
             Price = price;
             Description = description;
             FKID = fkId;
+            OtherID = otherId;
             CommonDate = commonDate;
             CommonFKID = commonFkId;
         }
@@ -111,6 +114,8 @@ namespace test.com.DTO
         public string Description { get; }
 
         public int? FKID { get; }
+
+        public long? OtherID { get; }
     }
 }
 """

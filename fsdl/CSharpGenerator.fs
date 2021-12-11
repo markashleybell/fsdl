@@ -95,6 +95,7 @@ module CSharpGenerator =
         let (validationAttributes, cSharpDataType) =
             match dataType with
             | INT -> ((if addDapperAttributes && isNonKeyIdentity then ["[d.Computed]"] else []), "int" |> nullableDataType isNullable)
+            | BIGINT -> ((if addDapperAttributes && isNonKeyIdentity then ["[d.Computed]"] else []), "long" |> nullableDataType isNullable)
             | BIT -> ([], "bool" |> nullableDataType isNullable)
             | MONEY -> ([], "decimal" |> nullableDataType isNullable)
             | DATE -> ([], "DateTime" |> nullableDataType isNullable)
@@ -193,6 +194,7 @@ module CSharpGenerator =
         let cSharpDataType =
             match dataType with
             | INT -> ("int" |> nullableDataType isNullable)
+            | BIGINT -> ("long" |> nullableDataType isNullable)
             | BIT -> ("bool" |> nullableDataType isNullable)
             | MONEY -> ("decimal" |> nullableDataType isNullable)
             | DATE -> ("DateTime" |> nullableDataType isNullable)
