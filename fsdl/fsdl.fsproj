@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net462</TargetFramework>
+        <TargetFramework>net472</TargetFramework>
         <Authors>Mark Ashley Bell</Authors>
         <Description>A code generation library for creating Dapper-based C# persistence layer classes with backing SQL table definitions.</Description>
         <Copyright>© Mark Ashley Bell 2018</Copyright>
